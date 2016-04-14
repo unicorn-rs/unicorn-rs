@@ -4,12 +4,18 @@ extern crate libc;
 extern crate bitflags;
 
 pub mod ffi;
+pub mod arm64_const;
+pub mod arm_const;
 pub mod mips_const;
+pub mod sparc_const;
 pub mod unicorn_const;
 pub mod x86_const;
 
 use ffi::*;
+pub use arm64_const::*;
+pub use arm_const::*;
 pub use mips_const::*;
+pub use sparc_const::*;
 pub use unicorn_const::*;
 pub use x86_const::*;
 
@@ -49,7 +55,6 @@ impl Unicorn {
     pub fn reg_write(&self, regid: i32, value: u64) -> Result<(), Error> {
         let p_value: *const u64 = &value;
         let err = unsafe {
-            // TODO : transmute regid and be done with it.
             uc_reg_write(self.handle, regid, p_value as *const libc::c_void)
         } as Error;
         if err == Error::OK {
@@ -192,6 +197,7 @@ impl Unicorn {
             Err(err)
         }
     }
+
     // TODO : Add support for memory hooks.
     pub fn add_code_hook(&self,
                          hook_type: HookType,
