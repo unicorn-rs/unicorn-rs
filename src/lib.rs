@@ -4,10 +4,12 @@ extern crate libc;
 extern crate bitflags;
 
 pub mod ffi;
+pub mod mips_const;
 pub mod unicorn_const;
 pub mod x86_const;
 
 use ffi::*;
+pub use mips_const::*;
 pub use unicorn_const::*;
 pub use x86_const::*;
 
@@ -44,8 +46,20 @@ impl Unicorn {
         }
     }
 
-    // TODO: use Reg trait
-    pub fn reg_write(&self, regid: RegisterX86, value: i32) -> Result<(), Error> {
+    pub fn reg_write(&self, regid: i32, value: u64) -> Result<(), Error> {
+        let p_value: *const u64 = &value;
+        let err = unsafe {
+            // TODO : transmute regid and be done with it.
+            uc_reg_write(self.handle, regid, p_value as *const libc::c_void)
+        } as Error;
+        if err == Error::OK {
+            Ok(())
+        } else {
+            Err(err)
+        }
+    }
+
+    pub fn reg_write_i32(&self, regid: i32, value: i32) -> Result<(), Error> {
         let p_value: *const i32 = &value;
         let err = unsafe {
             uc_reg_write(self.handle,
@@ -59,8 +73,22 @@ impl Unicorn {
         }
     }
 
-    // TODO: use Reg trait
-    pub fn reg_read(&self, regid: RegisterX86) -> Result<i32, Error> {
+    pub fn reg_read(&self, regid: i32) -> Result<u64, Error> {
+        let mut value: u64 = 0;
+        let p_value: *mut u64 = &mut value;
+        let err = unsafe {
+            uc_reg_read(self.handle,
+                        regid as libc::c_int,
+                        p_value as *mut libc::c_void)
+        } as Error;
+        if err == Error::OK {
+            Ok(value)
+        } else {
+            Err(err)
+        }
+    }
+
+    pub fn reg_read_i32(&self, regid: i32) -> Result<i32, Error> {
         let mut value: i32 = 0;
         let p_value: *mut i32 = &mut value;
         let err = unsafe {
@@ -164,6 +192,7 @@ impl Unicorn {
             Err(err)
         }
     }
+    // TODO : Add support for memory hooks.
     pub fn add_code_hook(&self,
                          hook_type: HookType,
                          callback: extern "C" fn(uc_handle, u64, u32, *mut u64))
