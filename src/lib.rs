@@ -1,4 +1,3 @@
-#![feature(libc)]
 extern crate libc;
 #[macro_use]
 extern crate bitflags;
