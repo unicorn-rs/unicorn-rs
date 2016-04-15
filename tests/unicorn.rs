@@ -71,10 +71,10 @@ fn emulate_mips() {
     
     assert_eq!(emu.mem_read(0x1000, MIPS_CODE32.len()), Ok(MIPS_CODE32.clone()));  
     
-    assert_eq!(emu.reg_write(unicorn::MIPS_REG_AT, 0), Ok(()));
+    assert_eq!(emu.reg_write(unicorn::RegisterMIPS::AT as i32, 0), Ok(()));
     
     assert_eq!(emu.emu_start(0x1000, (0x1000 + MIPS_CODE32.len()) as u64, (10 * unicorn::SECOND_SCALE) as u64, 1000), Ok(()));
-    assert_eq!(emu.reg_read(unicorn::MIPS_REG_AT), Ok((0x3456)));
+    assert_eq!(emu.reg_read(unicorn::RegisterMIPS::AT as i32), Ok((0x3456)));
 }
 
 #[test]

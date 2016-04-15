@@ -20,12 +20,11 @@ pub enum Arch {
 }
 
 // Mode type
-// TODO : allow alias modes
 #[repr(C)]
 #[derive(PartialEq, Debug)]
 pub enum Mode {
     LITTLE_ENDIAN = 0, // little-endian mode (default mode)
-    // UC_MODE_ARM = 0,    // 32-bit ARM
+    // MODE_ARM = 0,    // 32-bit ARM
     MODE_16 = 1 << 1, // 16-bit mode (X86)
     MODE_32 = 1 << 2, // 32-bit mode (X86)
     MODE_64 = 1 << 3, // 64-bit mode (X86, PPC)
@@ -41,23 +40,6 @@ pub enum Mode {
                            * UC_MODE_MIPS32 = UC_MODE_32,    // Mips32 ISA (Mips)
                            * UC_MODE_MIPS64 = UC_MODE_64,    // Mips64 ISA (Mips) */
 }
-
-pub const MODE_LITTLE_ENDIAN: u32 = 0;
-pub const MODE_ARM: u32 = 0;
-pub const MODE_16: u32 = 2;
-pub const MODE_32: u32 = 4;
-pub const MODE_64: u32 = 8;
-pub const MODE_THUMB: u32 = 16;
-pub const MODE_MCLASS: u32 = 32;
-pub const MODE_V8: u32 = 64;
-pub const MODE_MICRO: u32 = 16;
-pub const MODE_MIPS3: u32 = 32;
-pub const MODE_MIPS32R6: u32 = 64;
-pub const MODE_V9: u32 = 16;
-pub const MODE_QPX: u32 = 16;
-pub const MODE_BIG_ENDIAN: u32 = 1073741824;
-pub const MODE_MIPS32: u32 = 4;
-pub const MODE_MIPS64: u32 = 8;
 
 // All type of errors encountered by Unicorn API.
 // These are values returned by uc_errno()
