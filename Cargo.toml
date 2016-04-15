@@ -5,3 +5,4 @@ authors = ["Sébastien Duquette <ekse.0x@gmail.com>"]
 
 [dependencies]
 bitflags = "0.3"
+libc = "0.2.*"
