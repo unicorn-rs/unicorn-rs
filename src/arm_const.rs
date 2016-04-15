@@ -1,5 +1,3 @@
-// For Unicorn Engine. AUTO-GENERATED FILE, DO NOT EDIT [arm_const.rs]
-
 // ARM registers
 #[repr(C)]
 #[derive(PartialEq, Debug)]

@@ -1,5 +1,3 @@
-// For Unicorn Engine. AUTO-GENERATED FILE, DO NOT EDIT [sparc_const.rs]
-
 // SPARC registers
 #[repr(C)]
 #[derive(PartialEq, Debug)]

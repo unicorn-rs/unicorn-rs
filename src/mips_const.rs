@@ -1,5 +1,3 @@
-// For Unicorn Engine. AUTO-GENERATED FILE, DO NOT EDIT [mips_const.rs]
-
 // MIPS registers
 #[repr(C)]
 #[derive(PartialEq, Debug)]
