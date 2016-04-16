@@ -12,6 +12,8 @@ pub mod unicorn_const;
 pub mod x86_const;
 
 use ffi::*;
+use std::ffi::CStr;
+
 pub use arm64_const::*;
 pub use arm_const::*;
 pub use m68k_const::*;
@@ -26,7 +28,14 @@ pub struct Unicorn {
 
 #[allow(non_camel_case_types)]
 pub type uc_handle = libc::size_t;
+#[allow(non_camel_case_types)]
 pub type uc_hook = libc::size_t;
+
+impl Error {
+    pub fn msg(&self) -> String {
+        error_msg(*self)
+    }
+}
 
 pub fn version() -> (libc::size_t, libc::size_t) {
     let mut major: libc::size_t = 0;
@@ -41,6 +50,10 @@ pub fn version() -> (libc::size_t, libc::size_t) {
 
 pub fn arch_supported(arch: Arch) -> bool {
     unsafe { uc_arch_supported(arch) }
+}
+
+pub fn error_msg(error: Error) -> String {
+    unsafe { CStr::from_ptr(uc_strerror(error)).to_string_lossy().into_owned() }
 }
 
 impl Unicorn {

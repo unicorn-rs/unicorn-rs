@@ -1,8 +1,6 @@
-// For Unicorn Engine. AUTO-GENERATED FILE, DO NOT EDIT [x86_const.rs]
-
 // X86 registers
-#[repr(C)]
-#[derive(PartialEq, Debug)]
+#[repr(i32)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum RegisterX86 {
     INVALID = 0,
     AH,

@@ -1,5 +1,5 @@
 use libc;
-
+use std::os::raw::c_char;
 use unicorn_const::{Arch, Mode, Error, HookType, Query};
 use {uc_handle, uc_hook};
 
@@ -10,7 +10,7 @@ extern "C" {
     pub fn uc_open(arch: Arch, mode: Mode, engine: *mut uc_handle) -> Error;
     pub fn uc_close(engine: uc_handle) -> Error;
     pub fn uc_errno(engine: uc_handle) -> Error;
-    // TODO: const char *uc_strerror(uc_err code);
+    pub fn uc_strerror(error_code: Error) -> *const c_char;
     pub fn uc_reg_write(engine: uc_handle,
                         regid: libc::c_int,
                         value: *const libc::c_void)

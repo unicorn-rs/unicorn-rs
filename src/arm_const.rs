@@ -1,6 +1,6 @@
 // ARM registers
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum RegisterARM {
     INVALID = 0,
     APSR = 1,

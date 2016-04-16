@@ -1,6 +1,6 @@
 // MIPS registers
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum RegisterMIPS {
     INVALID = 0,
 

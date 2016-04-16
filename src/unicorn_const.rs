@@ -1,5 +1,3 @@
-// For Unicorn Engine. AUTO-GENERATED FILE, DO NOT EDIT [unicorn_const.rs]
-
 pub const API_MAJOR: u32 = 0;
 pub const API_MINOR: u32 = 9;
 pub const SECOND_SCALE: u64 = 1000000;
@@ -7,7 +5,7 @@ pub const MILISECOND_SCALE: u64 = 1000;
 
 // Architecture type
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Arch {
     ARM = 1, // ARM architecture (including Thumb, Thumb-2)
     ARM64, // ARM-64, also called AArch64
@@ -21,7 +19,7 @@ pub enum Arch {
 
 // Mode type
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Mode {
     LITTLE_ENDIAN = 0, // little-endian mode (default mode)
     // MODE_ARM = 0,    // 32-bit ARM
@@ -44,7 +42,7 @@ pub enum Mode {
 // All type of errors encountered by Unicorn API.
 // These are values returned by uc_errno()
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Error {
     OK = 0, // No error: everything was fine
     NOMEM, // Out-Of-Memory error: uc_open(), uc_emulate()
@@ -80,7 +78,7 @@ bitflags! {
 }
 
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum HookType {
     INTR = 1 << 0, // Hook all interrupt/syscall events
     INSN = 1 << 1, // Hook a particular instruction
@@ -98,7 +96,7 @@ pub enum HookType {
 }
 
 #[repr(C)]
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Query {
     // Dynamically query current hardware mode.
     MODE = 1,
