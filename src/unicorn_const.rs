@@ -96,3 +96,11 @@ pub enum HookType {
     MEM_WRITE = 1 << 11, // Hook memory write events.
     MEM_FETCH = 1 << 12, // Hook memory fetch for execution events
 }
+
+#[repr(C)]
+#[derive(PartialEq, Debug)]
+pub enum Query {
+    // Dynamically query current hardware mode.
+    MODE = 1,
+    PAGE_SIZE,
+}

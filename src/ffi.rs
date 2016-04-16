@@ -1,6 +1,6 @@
 use libc;
 
-use unicorn_const::{Arch, Mode, Error, HookType};
+use unicorn_const::{Arch, Mode, Error, HookType, Query};
 use {uc_handle, uc_hook};
 
 #[link(name = "unicorn")]
@@ -49,4 +49,5 @@ extern "C" {
                        ...)
                        -> Error;
     pub fn uc_hook_del(engine: uc_handle, hook: uc_hook) -> Error;
+    pub fn uc_query(engine: uc_handle, query_type: Query, result: *mut libc::size_t) -> Error;
 }

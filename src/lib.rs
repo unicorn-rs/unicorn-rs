@@ -232,6 +232,17 @@ impl Unicorn {
     pub fn errno(&self) -> Error {
         unsafe { uc_errno(self.handle) }
     }
+
+    pub fn query(&self, query: Query) -> Result<usize, Error> {
+        let mut result: libc::size_t = 0;
+        let p_result: *mut libc::size_t = &mut result;
+        let err = unsafe { uc_query(self.handle, query, p_result) } as Error;
+        if err == Error::OK {
+            Ok(result)
+        } else {
+            Err(err)
+        }
+    }
 }
 
 impl Drop for Unicorn {
