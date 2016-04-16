@@ -1,6 +1,6 @@
 use libc;
 use std::os::raw::c_char;
-use unicorn_const::{Arch, Mode, Error, HookType, Query};
+use unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 use {uc_handle, uc_hook};
 
 #[link(name = "unicorn")]
@@ -32,6 +32,10 @@ extern "C" {
                           address: u64,
                           size: libc::size_t,
                           perms: u32)
+                          -> Error;
+    pub fn uc_mem_regions(engine: uc_handle,
+                          regions: *const *const MemRegion,
+                          count: *mut u32)
                           -> Error;
     pub fn uc_emu_start(engine: uc_handle,
                         begin: u64,

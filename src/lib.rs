@@ -12,6 +12,7 @@ pub mod unicorn_const;
 pub mod x86_const;
 
 use ffi::*;
+use std::mem;
 use std::ffi::CStr;
 
 pub use arm64_const::*;
@@ -182,6 +183,32 @@ impl Unicorn {
         } as Error;
         if err == Error::OK {
             Ok(())
+        } else {
+            Err(err)
+        }
+    }
+
+    pub fn mem_regions(&self) -> Result<Vec<MemRegion>, Error> {
+        // We make a copy of the MemRegion structs that are returned by uc_mem_regions()
+        // as they have to be freed to the caller. It is simpler to make a copy and free()
+        // the originals right away.
+        let mut nb_regions: u32 = 0;
+        let p_nb_regions: *mut u32 = &mut nb_regions;
+        let p_regions: *const MemRegion = std::ptr::null();
+        let pp_regions: *const *const MemRegion = &p_regions;
+        let err = unsafe { uc_mem_regions(self.handle, pp_regions, p_nb_regions) } as Error;
+        if err == Error::OK {
+            let mut regions: Vec<MemRegion> = Vec::new();
+            let mut i: isize = 0;
+            while i < nb_regions as isize {
+                unsafe {
+                    let region: MemRegion = mem::transmute_copy(&*p_regions.offset(i));
+                    regions.push(region);
+                }
+                i += 1;
+            }
+            unsafe { libc::free(*pp_regions as *mut libc::c_void) };
+            Ok(regions)
         } else {
             Err(err)
         }

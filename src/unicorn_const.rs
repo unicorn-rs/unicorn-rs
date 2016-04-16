@@ -78,6 +78,14 @@ bitflags! {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone)]
+pub struct MemRegion {
+    begin: u64, // begin address of the region (inclusive)
+    end: u64, // end address of the region (inclusive)
+    perms: Protection, // memory permissions of the region
+}
+
+#[repr(C)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum HookType {
     INTR = 1 << 0, // Hook all interrupt/syscall events
