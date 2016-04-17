@@ -21,5 +21,4 @@ pub enum RegisterM68K {
     D7,
     SR,
     PC,
-    ENDING, // <-- mark the end of the list of registers
 }

@@ -265,5 +265,4 @@ pub enum RegisterARM64 {
 
     // pseudo registers
     PC = 260,
-    ENDING = 261,
 }

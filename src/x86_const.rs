@@ -244,5 +244,4 @@ pub enum RegisterX86 {
     R13W,
     R14W,
     R15W,
-    ENDING, // <-- mark the end of the list of registers
 }

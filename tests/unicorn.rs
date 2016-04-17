@@ -44,7 +44,7 @@ fn emulate_amd64_negative_values() {
 
 
 #[test]
-fn x86_callback() {
+fn x86_code_callback() {
     #[allow(unused_variables)]
     extern fn callback(engine : uc_handle, address : u64, size : u32, user_data : *mut u64) {
         println!("in callback at 0x{:08x}!", address);
@@ -58,8 +58,27 @@ fn x86_callback() {
     
     let hook = emu.add_code_hook(unicorn::HookType::BLOCK, 0x1000, 0x2000, callback).expect("failed to add code hook");
     assert_eq!(emu.emu_start(0x1000, 0x1001, 10 * unicorn::SECOND_SCALE, 1000), Ok(()));
-    assert_eq!(emu.hook_del(hook), Ok(()));
+    assert_eq!(emu.remove_hook(hook), Ok(()));
 
+}
+
+#[test]
+fn x86_mem_callback() {
+    #[allow(unused_variables)]
+    extern fn callback(engine : uc_handle, mem_type : unicorn::MemType, address : u64, size : i32, value : i64, user_data : *mut u64) {
+        println!("unmapped mem read at 0x{:08x}!", address);
+    }
+    
+    let x86_code32 : Vec<u8> = vec![0x8b, 0x00]; // MOV eax, dword [eax]
+    
+    let emu = Unicorn::new(unicorn::Arch::X86, unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(())); 
+    assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
+    
+    let hook = emu.add_mem_hook(unicorn::HookType::MEM_READ_UNMAPPED, 0, std::u64::MAX, callback).expect("failed to add memory hook");
+    assert_eq!(emu.reg_write(unicorn::RegisterX86::EAX as i32, 0x123), Ok(()));
+    assert_eq!(emu.emu_start(0x1000, 0x1001, 10 * unicorn::SECOND_SCALE, 1), Err((unicorn::Error::READ_UNMAPPED)));
+    assert_eq!(emu.remove_hook(hook), Ok(()));
 }
 
 #[test] 

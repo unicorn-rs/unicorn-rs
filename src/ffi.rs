@@ -44,11 +44,10 @@ extern "C" {
                         count: libc::size_t)
                         -> Error;
     pub fn uc_emu_stop(engine: uc_handle) -> Error;
-    // TODO: uc_hook_add currently only supports hookcode callbacks.
     pub fn uc_hook_add(engine: uc_handle,
                        hook: *mut uc_hook,
                        hook_type: HookType,
-                       callback: extern "C" fn(uc_handle, u64, u32, *mut u64),
+                       callback: libc::size_t,
                        user_data: *mut libc::size_t,
                        begin: u64,
                        end: u64,

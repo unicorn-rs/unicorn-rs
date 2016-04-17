@@ -113,5 +113,4 @@ pub enum RegisterARM {
     S29 = 108,
     S30 = 109,
     S31 = 110,
-    ENDING = 111,
 }

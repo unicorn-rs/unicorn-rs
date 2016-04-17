@@ -7,14 +7,20 @@ pub const MILISECOND_SCALE: u64 = 1000;
 #[repr(C)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Arch {
-    ARM = 1, // ARM architecture (including Thumb, Thumb-2)
-    ARM64, // ARM-64, also called AArch64
-    MIPS, // Mips architecture
-    X86, // X86 architecture (including x86 & x86-64)
-    PPC, // PowerPC architecture
-    SPARC, // Sparc architecture
-    M68K, // M68K architecture
-    MAX,
+    /// ARM architecture (including Thumb, Thumb-2) 
+    ARM = 1,
+    /// ARM-64, also called AArch64 
+    ARM64,
+    /// MIPS architecture 
+    MIPS,
+    /// X86 architecture (including x86 & x86-64) 
+    X86,
+    /// PowerPC architecture 
+    PPC,
+    /// Sparc architecture 
+    SPARC,
+    /// M68K architecture 
+    M68K,
 }
 
 // Mode type
@@ -80,9 +86,26 @@ bitflags! {
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct MemRegion {
-    begin: u64, // begin address of the region (inclusive)
-    end: u64, // end address of the region (inclusive)
-    perms: Protection, // memory permissions of the region
+    /// The start address of the region (inclusive).
+    begin: u64,
+    /// The end address of the region (inclusive).
+    end: u64,
+    /// The memory permissions of the region.
+    perms: Protection,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub enum MemType {
+    READ = 16, // Memory is read from
+    WRITE, // Memory is written to
+    FETCH, // Memory is fetched
+    READ_UNMAPPED, // Unmapped memory is read from
+    WRITE_UNMAPPED, // Unmapped memory is written to
+    MEM_FETCH_UNMAPPED, // Unmapped memory is fetched
+    WRITE_PROT, // Write to write protected, but mapped, memory
+    READ_PROT, // Read from read protected, but mapped, memory
+    FETCH_PROT, // Fetch from non-executable, but mapped, memory
 }
 
 #[repr(C)]
@@ -106,7 +129,8 @@ pub enum HookType {
 #[repr(C)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Query {
-    // Dynamically query current hardware mode.
+    /// The current hardware mode.
     MODE = 1,
+    /// The page size used by the emulator
     PAGE_SIZE,
 }

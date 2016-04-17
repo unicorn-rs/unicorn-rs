@@ -91,5 +91,4 @@ pub enum RegisterSPARC {
     Y = 86,
     XCC = 87,
     PC = 88,
-    ENDING = 89,
 }

@@ -151,5 +151,4 @@ pub enum RegisterMIPS {
     MPL0 = 134,
     MPL1 = 135,
     MPL2 = 136,
-    ENDING = 137,
 }
