@@ -56,7 +56,7 @@ fn x86_callback() {
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(())); 
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     
-    let hook = emu.add_code_hook(unicorn::HookType::BLOCK, callback).expect("failed to add code hook");
+    let hook = emu.add_code_hook(unicorn::HookType::BLOCK, 0x1000, 0x2000, callback).expect("failed to add code hook");
     
     assert_eq!(emu.emu_start(0x1000, 0x1001, 10 * unicorn::SECOND_SCALE as u64, 1000), Ok(()));
     assert_eq!(emu.hook_del(hook), Ok(()));

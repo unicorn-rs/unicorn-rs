@@ -242,6 +242,8 @@ impl Unicorn {
     // TODO : Add support for memory hooks.
     pub fn add_code_hook(&self,
                          hook_type: HookType,
+                         begin: u64,
+                         end: u64,
                          callback: extern "C" fn(uc_handle, u64, u32, *mut u64))
                          -> Result<uc_hook, Error> {
         let mut hook: libc::size_t = 0;
@@ -250,7 +252,13 @@ impl Unicorn {
         let p_user_data: *mut libc::size_t = &mut user_data;
 
         let err = unsafe {
-            uc_hook_add(self.handle, p_hook, hook_type, callback, p_user_data)
+            uc_hook_add(self.handle,
+                        p_hook,
+                        hook_type,
+                        callback,
+                        p_user_data,
+                        begin,
+                        end)
         } as Error;
         if err == Error::OK {
             Ok(hook)

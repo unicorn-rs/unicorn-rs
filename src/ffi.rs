@@ -50,6 +50,8 @@ extern "C" {
                        hook_type: HookType,
                        callback: extern "C" fn(uc_handle, u64, u32, *mut u64),
                        user_data: *mut libc::size_t,
+                       begin: u64,
+                       end: u64,
                        ...)
                        -> Error;
     pub fn uc_hook_del(engine: uc_handle, hook: uc_hook) -> Error;
