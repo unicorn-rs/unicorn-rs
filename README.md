@@ -33,3 +33,8 @@ To test this project please follow these steps :
 
 The bindings do not currently support callbacks for tracing interrupts and IN/OUT instructions for x86. Please create
 an issue (or a pull request) if this something you would like to be added.
+
+## Contributors
+
+- Sébastien Duquette (@ekse)
+- Richo Healey (@richo)
