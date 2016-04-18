@@ -23,6 +23,9 @@ pub use sparc_const::*;
 pub use unicorn_const::*;
 pub use x86_const::*;
 
+pub const BINDINGS_MAJOR: u32 = 1;
+pub const BINDINGS_MINOR: u32 = 0;
+
 /// An emulator instance.
 pub struct Unicorn {
     handle: libc::size_t, // Opaque handle to uc_engine
@@ -39,12 +42,17 @@ impl Error {
     }
 }
 
+/// Returns a tuple `(major, minor)` for the bindings version number.
+pub fn bindings_version() -> (u32, u32) {
+    (BINDINGS_MAJOR, BINDINGS_MINOR)
+}
+
 /// Returns a tuple `(major, minor)` for the unicorn version number.
-pub fn version() -> (libc::size_t, libc::size_t) {
-    let mut major: libc::size_t = 0;
-    let mut minor: libc::size_t = 0;
-    let p_major: *mut libc::size_t = &mut major;
-    let p_minor: *mut libc::size_t = &mut minor;
+pub fn unicorn_version() -> (u32, u32) {
+    let mut major: u32 = 0;
+    let mut minor: u32 = 0;
+    let p_major: *mut u32 = &mut major;
+    let p_minor: *mut u32 = &mut minor;
     unsafe {
         uc_version(p_major, p_minor);
     }
@@ -64,12 +72,19 @@ pub fn error_msg(error: Error) -> String {
 impl Unicorn {
     /// Create a new instance of the unicorn engine for the specified architecture
     /// and hardware mode.
-    pub fn new(arch: Arch, mode: Mode) -> Option<Unicorn> {
+    pub fn new(arch: Arch, mode: Mode) -> Result<Unicorn, Error> {
+        // Verify bindings compatibility with the core before going further.
+        let (major, minor) = unicorn_version();
+        if major != BINDINGS_MAJOR || minor != BINDINGS_MINOR {
+            return Err(Error::VERSION);
+        }
+
         let mut handle: libc::size_t = 0;
-        if let Error::OK = unsafe { uc_open(arch, mode, &mut handle) } {
-            Some(Unicorn { handle: handle })
+        let err = unsafe { uc_open(arch, mode, &mut handle) };
+        if err == Error::OK {
+            Ok(Unicorn { handle: handle })
         } else {
-            None
+            Err(err)
         }
     }
 
@@ -80,9 +95,7 @@ impl Unicorn {
     /// You need to cast the register with `as i32`.
     pub fn reg_write(&self, regid: i32, value: u64) -> Result<(), Error> {
         let p_value: *const u64 = &value;
-        let err = unsafe {
-            uc_reg_write(self.handle, regid, p_value as *const libc::c_void)
-        } as Error;
+        let err = unsafe { uc_reg_write(self.handle, regid, p_value as *const libc::c_void) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -100,7 +113,7 @@ impl Unicorn {
             uc_reg_write(self.handle,
                          regid as libc::c_int,
                          p_value as *const libc::c_void)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(())
         } else {
@@ -120,7 +133,7 @@ impl Unicorn {
             uc_reg_read(self.handle,
                         regid as libc::c_int,
                         p_value as *mut libc::c_void)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(value)
         } else {
@@ -140,7 +153,7 @@ impl Unicorn {
             uc_reg_read(self.handle,
                         regid as libc::c_int,
                         p_value as *mut libc::c_void)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(value)
         } else {
@@ -157,7 +170,7 @@ impl Unicorn {
                    size: libc::size_t,
                    perms: Protection)
                    -> Result<(), Error> {
-        let err = unsafe { uc_mem_map(self.handle, address, size, perms.bits()) } as Error;
+        let err = unsafe { uc_mem_map(self.handle, address, size, perms.bits()) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -170,7 +183,7 @@ impl Unicorn {
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
     /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
     pub fn mem_unmap(&self, address: u64, size: libc::size_t) -> Result<(), Error> {
-        let err = unsafe { uc_mem_unmap(self.handle, address, size) } as Error;
+        let err = unsafe { uc_mem_unmap(self.handle, address, size) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -185,7 +198,7 @@ impl Unicorn {
                          address,
                          bytes.as_ptr(),
                          bytes.len() as libc::size_t)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(())
         } else {
@@ -201,7 +214,7 @@ impl Unicorn {
                         address,
                         bytes.as_mut_ptr(),
                         size as libc::size_t)
-        } as Error;
+        };
         if err == Error::OK {
             unsafe {
                 bytes.set_len(size);
@@ -219,7 +232,7 @@ impl Unicorn {
     pub fn mem_protect(&self, address: u64, size: usize, perms: Protection) -> Result<(), Error> {
         let err = unsafe {
             uc_mem_protect(self.handle, address, size as libc::size_t, perms.bits())
-        } as Error;
+        };
         if err == Error::OK {
             Ok(())
         } else {
@@ -236,7 +249,7 @@ impl Unicorn {
         let p_nb_regions: *mut u32 = &mut nb_regions;
         let p_regions: *const MemRegion = std::ptr::null();
         let pp_regions: *const *const MemRegion = &p_regions;
-        let err = unsafe { uc_mem_regions(self.handle, pp_regions, p_nb_regions) } as Error;
+        let err = unsafe { uc_mem_regions(self.handle, pp_regions, p_nb_regions) };
         if err == Error::OK {
             let mut regions: Vec<MemRegion> = Vec::new();
             let mut i: isize = 0;
@@ -268,7 +281,7 @@ impl Unicorn {
                      -> Result<(), Error> {
         let err = unsafe {
             uc_emu_start(self.handle, begin, until, timeout, count as libc::size_t)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(())
         } else {
@@ -281,7 +294,7 @@ impl Unicorn {
     /// This is usually called from callback function in hooks.
     /// NOTE: For now, this will stop the execution only after the current block.
     pub fn emu_stop(&self) -> Result<(), Error> {
-        let err = unsafe { uc_emu_stop(self.handle) } as Error;
+        let err = unsafe { uc_emu_stop(self.handle) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -313,7 +326,7 @@ impl Unicorn {
                         p_user_data,
                         begin,
                         end)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(hook)
         } else {
@@ -347,7 +360,7 @@ impl Unicorn {
                         p_user_data,
                         begin,
                         end)
-        } as Error;
+        };
         if err == Error::OK {
             Ok(hook)
         } else {
@@ -384,7 +397,7 @@ impl Unicorn {
     pub fn query(&self, query: Query) -> Result<usize, Error> {
         let mut result: libc::size_t = 0;
         let p_result: *mut libc::size_t = &mut result;
-        let err = unsafe { uc_query(self.handle, query, p_result) } as Error;
+        let err = unsafe { uc_query(self.handle, query, p_result) };
         if err == Error::OK {
             Ok(result)
         } else {

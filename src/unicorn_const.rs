@@ -1,5 +1,3 @@
-pub const API_MAJOR: u32 = 0;
-pub const API_MINOR: u32 = 9;
 pub const SECOND_SCALE: u64 = 1000000;
 pub const MILISECOND_SCALE: u64 = 1000;
 

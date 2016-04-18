@@ -5,7 +5,7 @@ use {uc_handle, uc_hook};
 
 #[link(name = "unicorn")]
 extern "C" {
-    pub fn uc_version(major: *const libc::size_t, minor: *const libc::size_t) -> libc::size_t;
+    pub fn uc_version(major: *const u32, minor: *const u32) -> u32;
     pub fn uc_arch_supported(arch: Arch) -> bool;
     pub fn uc_open(arch: Arch, mode: Mode, engine: *mut uc_handle) -> Error;
     pub fn uc_close(engine: uc_handle) -> Error;

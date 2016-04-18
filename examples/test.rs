@@ -3,7 +3,7 @@ extern crate unicorn;
 use unicorn::Unicorn;
 
 fn main() {
-    let (major, minor) = unicorn::version();
+    let (major, minor) = unicorn::unicorn_version();
     println!("version : {}.{}", major, minor);
     println!("Support for:\n\t x86: {}\n\t arm: {}\n\t mips: {}", 
             unicorn::arch_supported(unicorn::Arch::X86),
