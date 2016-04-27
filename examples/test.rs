@@ -1,6 +1,6 @@
 extern crate unicorn;
 
-use unicorn::{Cpu, CpuX86};
+use unicorn::{Cpu, CpuARM};
 
 fn main() {
     let (major, minor) = unicorn::unicorn_version();
@@ -10,7 +10,7 @@ fn main() {
             unicorn::arch_supported(unicorn::Arch::ARM),
             unicorn::arch_supported(unicorn::Arch::MIPS));
 
-    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to create emulator");
+    let emu = CpuARM::new(unicorn::Mode::THUMB).expect("failed to create emulator");
 
     let page_size = emu.query(unicorn::Query::PAGE_SIZE).expect("failed to query page size");
     println!("page size : {}", page_size);

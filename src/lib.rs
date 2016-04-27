@@ -1,3 +1,29 @@
+//! Bindings for the Unicorn emulator.
+//!
+//! You most likely want to use one of the Cpu structs (`CpuX86`, `CpuARM`, etc.).
+//!
+//! # Example use
+//!
+//! ```rust
+//! extern crate unicorn;
+//!
+//! use unicorn::{Cpu, CpuX86, uc_handle};
+//!
+//! fn main() {
+//!    let x86_code32 : Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
+//!
+//!    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+//!    emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL); 
+//!    emu.mem_write(0x1000, &x86_code32); 
+//!    emu.reg_write_i32(unicorn::RegisterX86::ECX, -10);
+//!    emu.reg_write_i32(unicorn::RegisterX86::EDX, -50);
+//!
+//!    emu.emu_start(0x1000, (0x1000 + x86_code32.len()) as u64, 10 * unicorn::SECOND_SCALE, 1000);
+//!    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::ECX), Ok((-9)));
+//!    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok((-51)));
+//! }
+//! ```
+//! 
 extern crate libc;
 #[macro_use]
 extern crate bitflags;
@@ -28,6 +54,12 @@ pub const BINDINGS_MINOR: u32 = 0;
 
 pub trait Register {
     fn to_i32(&self) -> i32;
+}
+
+impl Register for RegisterARM {
+    fn to_i32(&self) -> i32 {
+        *self as i32
+    }
 }
 
 impl Register for RegisterARM64 {
@@ -194,6 +226,30 @@ pub trait Cpu {
     /// - `Query::MODE` : the current hardware mode.
     fn query(&self, query: Query) -> Result<usize, Error> {
         self.emu().query(query)
+    }
+}
+
+/// An ARM emulator instance.
+pub struct CpuARM {
+    emu: Unicorn,
+}
+
+impl CpuARM {
+    /// Create an ARM emulator instance for the specified hardware mode.
+    pub fn new(mode: Mode) -> Result<CpuARM, Error> {
+        let emu = Unicorn::new(Arch::ARM, mode);
+        match emu {
+            Ok(x) => Ok(CpuARM { emu: x }),
+            Err(x) => Err(x),
+        }
+    }
+}
+
+impl Cpu for CpuARM {
+    type Reg = RegisterARM;
+
+    fn emu(&self) -> &Unicorn {
+        &self.emu
     }
 }
 
