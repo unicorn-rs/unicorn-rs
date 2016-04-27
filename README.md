@@ -53,3 +53,4 @@ Contributors :
 
 - Sébastien Duquette (@ekse)
 - Richo Healey (@richo)
+- jschievink for his help with the API design
