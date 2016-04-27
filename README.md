@@ -23,18 +23,33 @@ fn main() {
 
 ## Installation
 
-To test this project please follow these steps :
+This project has been tested on Linux. The bindings are built for the master version of the unicorn
+git (currently at 1.0).
 
-1. Download and build and install unicorn normally with the `make.sh` and `make.sh install`. 
+To test this project, follow these steps :
+
+1. Clone unicorn from git with `git clone https://github.com/unicorn-engine/unicorn`.
+2. Build and install normally with `make.sh` and `make.sh install`. 
 2. Clone this project, `cd unicorn-rs` and `cargo build`.
 3. `cargo test` to make sure it works as expected.
+
+To use this package simply add it as dependency to the Cargo.toml of your program.
+
+```
+[dependencies]
+unicorn = "0.1.0"
+```
 
 ## Notes
 
 The bindings do not currently support callbacks for tracing interrupts and IN/OUT instructions for x86. Please create
 an issue (or a pull request) if this something you would like to be added.
 
-## Contributors
+## Contributing
+
+Contributions to this project are super appreciated. Pull requests, bug reports, code review, tests, documentation or feedback on your use of the bindings, nothing is too small. Don't hesitate to open an issue if you have questions.
+
+Contributors :
 
 - Sébastien Duquette (@ekse)
 - Richo Healey (@richo)
