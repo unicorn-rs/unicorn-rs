@@ -2,6 +2,11 @@
 name = "unicorn"
 version = "0.1.0"
 authors = ["Sébastien Duquette <ekse.0x@gmail.com>"]
+description = "Rust bindings for the unicorn emulator"
+repository = "https://github.com/ekse/unicorn-rs"
+license = "GPL-2.0"
+readme = "README.md"
+include = ["src/*", "tests/*", "Cargo.toml", "COPYING", "README.md"]
 
 [dependencies]
 bitflags = "0.3"
