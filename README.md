@@ -53,4 +53,5 @@ Contributors :
 
 - Sébastien Duquette (@ekse)
 - Richo Healey (@richo)
+- petevine for reviewing the project and adding tests
 - jschievink for his help with the API design
