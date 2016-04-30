@@ -26,14 +26,12 @@ fn main() {
 This project has been tested on Linux. The bindings are built for the master version of the unicorn
 git (currently at 1.0).
 
-To test this project, follow these steps :
+To use this package, first install unicorn from git :
 
 1. Clone unicorn from git with `git clone https://github.com/unicorn-engine/unicorn`.
-2. Build and install normally with `make.sh` and `make.sh install`. 
-2. Clone this project, `cd unicorn-rs` and `cargo build`.
-3. `cargo test` to make sure it works as expected.
+2. Build and install with `make.sh` and `make.sh install`.
 
-To use this package simply add it as dependency to the Cargo.toml of your program.
+Then simply add it as dependency to the Cargo.toml of your program.
 
 ```
 [dependencies]
