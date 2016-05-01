@@ -72,7 +72,7 @@ pub enum Error {
 
 #[repr(C)]
 bitflags! {
-    flags Protection : u32 {
+pub flags Protection : u32 {
         const PROT_NONE = 0,
         const PROT_READ = 1,
         const PROT_WRITE = 2,
