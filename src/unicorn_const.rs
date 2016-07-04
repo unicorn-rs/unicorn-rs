@@ -70,8 +70,8 @@ pub enum Error {
     HOOK_EXIST, // hook for this event already existed
 }
 
-#[repr(C)]
 bitflags! {
+#[repr(C)]
 pub flags Protection : u32 {
         const PROT_NONE = 0,
         const PROT_READ = 1,
