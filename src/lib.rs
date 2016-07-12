@@ -13,8 +13,8 @@
 //!    let x86_code32 : Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 //!
 //!    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-//!    emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL); 
-//!    emu.mem_write(0x1000, &x86_code32); 
+//!    emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL);
+//!    emu.mem_write(0x1000, &x86_code32);
 //!    emu.reg_write_i32(unicorn::RegisterX86::ECX, -10);
 //!    emu.reg_write_i32(unicorn::RegisterX86::EDX, -50);
 //!
@@ -23,7 +23,7 @@
 //!    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok((-51)));
 //! }
 //! ```
-//! 
+//!
 extern crate libc;
 #[macro_use]
 extern crate bitflags;
@@ -182,13 +182,12 @@ pub trait Cpu {
                      callback: extern "C" fn(engine: uc_handle,
                                              address: u64,
                                              size: u32,
-                                             user_data: *mut u64)
-                                            )
+                                             user_data: *mut u64))
                      -> Result<uc_hook, Error> {
         self.emu().add_code_hook(hook_type, begin, end, callback)
     }
 
-    /// Add a memory hook. 
+    /// Add a memory hook.
     fn add_mem_hook(&self,
                     hook_type: HookType,
                     begin: u64,
@@ -198,8 +197,7 @@ pub trait Cpu {
                                             address: u64,
                                             size: i32,
                                             value: i64,
-                                            user_data: *mut u64)
-                                           )
+                                            user_data: *mut u64))
                     -> Result<uc_hook, Error> {
         self.emu().add_mem_hook(hook_type, begin, end, callback)
     }
@@ -578,9 +576,8 @@ impl Unicorn {
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
     /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
     pub fn mem_protect(&self, address: u64, size: usize, perms: Protection) -> Result<(), Error> {
-        let err = unsafe {
-            uc_mem_protect(self.handle, address, size as libc::size_t, perms.bits())
-        };
+        let err =
+            unsafe { uc_mem_protect(self.handle, address, size as libc::size_t, perms.bits()) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -627,9 +624,8 @@ impl Unicorn {
                      timeout: u64,
                      count: usize)
                      -> Result<(), Error> {
-        let err = unsafe {
-            uc_emu_start(self.handle, begin, until, timeout, count as libc::size_t)
-        };
+        let err =
+            unsafe { uc_emu_start(self.handle, begin, until, timeout, count as libc::size_t) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -658,8 +654,7 @@ impl Unicorn {
                          callback: extern "C" fn(engine: uc_handle,
                                                  address: u64,
                                                  size: u32,
-                                                 user_data: *mut u64)
-                                                )
+                                                 user_data: *mut u64))
                          -> Result<uc_hook, Error> {
         let mut hook: libc::size_t = 0;
         let mut user_data: libc::size_t = 0;
@@ -682,7 +677,7 @@ impl Unicorn {
         }
     }
 
-    /// Add a memory hook. 
+    /// Add a memory hook.
     pub fn add_mem_hook(&self,
                         hook_type: HookType,
                         begin: u64,
@@ -692,8 +687,7 @@ impl Unicorn {
                                                 address: u64,
                                                 size: i32,
                                                 value: i64,
-                                                user_data: *mut u64)
-                                               )
+                                                user_data: *mut u64))
                         -> Result<uc_hook, Error> {
         let mut hook: libc::size_t = 0;
         let mut user_data: libc::size_t = 0;

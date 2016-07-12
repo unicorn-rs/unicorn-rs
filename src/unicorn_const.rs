@@ -5,19 +5,19 @@ pub const MILISECOND_SCALE: u64 = 1000;
 #[repr(C)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Arch {
-    /// ARM architecture (including Thumb, Thumb-2) 
+    /// ARM architecture (including Thumb, Thumb-2)
     ARM = 1,
-    /// ARM-64, also called AArch64 
+    /// ARM-64, also called AArch64
     ARM64,
-    /// MIPS architecture 
+    /// MIPS architecture
     MIPS,
-    /// X86 architecture (including x86 & x86-64) 
+    /// X86 architecture (including x86 & x86-64)
     X86,
-    /// PowerPC architecture 
+    /// PowerPC architecture
     PPC,
-    /// Sparc architecture 
+    /// Sparc architecture
     SPARC,
-    /// M68K architecture 
+    /// M68K architecture
     M68K,
 }
 
