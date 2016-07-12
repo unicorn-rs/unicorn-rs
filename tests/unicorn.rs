@@ -1,5 +1,7 @@
 extern crate unicorn;
 
+use std::cell::RefCell;
+use std::rc::Rc;
 use unicorn::{Cpu, CpuX86, CpuARM, CpuMIPS};
 
 #[test]
@@ -60,7 +62,7 @@ fn x86_code_callback() {
     struct CodeExpectation(u64, u32);
     let expects = vec![CodeExpectation(0x1000, 1), CodeExpectation(0x1001, 1)];
     let codes: Vec<CodeExpectation> = Vec::new();
-    let codes_cell = ::std::rc::Rc::new(::std::cell::RefCell::new(codes));
+    let codes_cell = Rc::new(RefCell::new(codes));
 
     let callback_codes = codes_cell.clone();
     let callback = move |_: &unicorn::Unicorn, address: u64, size: u32| {
@@ -87,7 +89,7 @@ fn x86_intr_callback() {
     #[derive(PartialEq, Debug)]
     struct IntrExpectation(u32);
     let expect = IntrExpectation(0x80);
-    let intr_cell = ::std::rc::Rc::new(::std::cell::RefCell::new(IntrExpectation(0)));
+    let intr_cell = Rc::new(RefCell::new(IntrExpectation(0)));
 
     let callback_intr = intr_cell.clone();
     let callback = move |_: &unicorn::Unicorn, intno: u32| {
@@ -119,7 +121,7 @@ fn x86_mem_callback() {
     let expects = vec![MemExpectation(unicorn::MemType::WRITE, 0x2000, 4, 0xdeadbeef),
                        MemExpectation(unicorn::MemType::READ_UNMAPPED, 0x10000, 4, 0)];
     let mems: Vec<MemExpectation> = Vec::new();
-    let mems_cell = ::std::rc::Rc::new(::std::cell::RefCell::new(mems));
+    let mems_cell = Rc::new(RefCell::new(mems));
 
     let callback_mems = mems_cell.clone();
     let callback = move |_: &unicorn::Unicorn,
