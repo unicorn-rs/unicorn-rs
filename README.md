@@ -47,9 +47,10 @@ an issue (or a pull request) if this something you would like to be added.
 
 Contributions to this project are super appreciated. Pull requests, bug reports, code review, tests, documentation or feedback on your use of the bindings, nothing is too small. Don't hesitate to open an issue if you have questions.
 
-Contributors :
+Contributors:
 
 - Sébastien Duquette (@ekse)
+- Israel Hallé (@isra17) for redesigning the callbacks API
 - Richo Healey (@richo)
 - petevine for reviewing the project and adding tests
 - jschievink for his help with the API design
