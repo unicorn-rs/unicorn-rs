@@ -42,7 +42,7 @@ unicorn = "0.1.0"
 
 ### 0.3.0
 
-The handling of callbacks has been modified, callbacks should implemented using closures. See the
+The handling of callbacks has been modified, callbacks should be implemented using closures. See the
 tests for examples.
 
 - added support for interrupt, in/out and sysenter callbacks
@@ -50,7 +50,7 @@ tests for examples.
 
 ## Contributing
 
-Contributions to this project are super appreciated. Pull requests, bug reports, code review, tests, 
+Contributions to this project are super appreciated. Pull requests, bug reports, code review, tests,
 documentation or feedback on your use of the bindings, nothing is too small. Don't hesitate to open
 an issue if you have questions.
 
