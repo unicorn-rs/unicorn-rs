@@ -38,14 +38,21 @@ Then simply add it as dependency to the Cargo.toml of your program.
 unicorn = "0.1.0"
 ```
 
-## Notes
+## Changelog
 
-The bindings do not currently support callbacks for tracing interrupts and IN/OUT instructions for x86. Please create
-an issue (or a pull request) if this something you would like to be added.
+### 0.3.0
+
+The handling of callbacks has been modified, callbacks should implemented using closures. See the
+tests for examples.
+
+- added support for interrupt, in/out and sysenter callbacks
+
 
 ## Contributing
 
-Contributions to this project are super appreciated. Pull requests, bug reports, code review, tests, documentation or feedback on your use of the bindings, nothing is too small. Don't hesitate to open an issue if you have questions.
+Contributions to this project are super appreciated. Pull requests, bug reports, code review, tests, 
+documentation or feedback on your use of the bindings, nothing is too small. Don't hesitate to open
+an issue if you have questions.
 
 Contributors:
 
