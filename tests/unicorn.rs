@@ -271,9 +271,11 @@ fn emulate_arm() {
 
     assert_eq!(emu.reg_write(unicorn::RegisterARM::SP, 12), Ok(()));
     assert_eq!(emu.reg_write(unicorn::RegisterARM::R0, 10), Ok(()));
-
-    assert_eq!(emu.emu_start(0x1000,
-                             (0x1000 + arm_code32.len()) as u64,
+    
+    // ARM checks the least significant bit of the address to know
+    // if the code is in Thumb mode.
+    assert_eq!(emu.emu_start(0x1000 | 0x01,
+                             (0x1000 | 0x01  + arm_code32.len()) as u64,
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
