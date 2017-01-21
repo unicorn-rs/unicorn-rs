@@ -1,4 +1,4 @@
-[submodule "unicorn"]
-    path = unicorn
-    url = https://github.com/unicorn-engine/unicorn
-    branch = master 
+[submodule "libunicorn-sys/unicorn"]
+	path = libunicorn-sys/unicorn
+	url = https://github.com/unicorn-engine/unicorn
+    branch = master

@@ -1,7 +1,17 @@
-use libc;
+extern crate libc;
+#[macro_use]
+extern crate bitflags;
+
+pub mod unicorn_const;
+
+use std::ffi::CStr;
 use std::os::raw::c_char;
 use unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
-use {uc_handle, uc_hook};
+
+#[allow(non_camel_case_types)]
+pub type uc_handle = libc::size_t;
+#[allow(non_camel_case_types)]
+pub type uc_hook = libc::size_t;
 
 extern "C" {
     pub fn uc_version(major: *const u32, minor: *const u32) -> u32;
@@ -54,4 +64,16 @@ extern "C" {
                        -> Error;
     pub fn uc_hook_del(engine: uc_handle, hook: uc_hook) -> Error;
     pub fn uc_query(engine: uc_handle, query_type: Query, result: *mut libc::size_t) -> Error;
+}
+
+
+impl Error {
+    pub fn msg(&self) -> String {
+        error_msg(*self)
+    }
+}
+
+/// Returns a string for the specified error code.
+pub fn error_msg(error: Error) -> String {
+    unsafe { CStr::from_ptr(uc_strerror(error)).to_string_lossy().into_owned() }
 }

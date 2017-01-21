@@ -70,6 +70,7 @@ pub enum Error {
     HOOK_EXIST, // hook for this event already existed
 }
 
+
 bitflags! {
 #[repr(C)]
 pub flags Protection : u32 {

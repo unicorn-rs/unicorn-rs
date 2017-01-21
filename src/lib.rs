@@ -24,23 +24,19 @@
 //! }
 //! ```
 //!
+extern crate libunicorn_sys as ffi;
 extern crate libc;
-#[macro_use]
-extern crate bitflags;
 
-pub mod ffi;
 pub mod arm64_const;
 pub mod arm_const;
 pub mod m68k_const;
 pub mod mips_const;
 pub mod sparc_const;
-pub mod unicorn_const;
 pub mod x86_const;
 
 use ffi::*;
 use std::mem;
 use std::collections::HashMap;
-use std::ffi::CStr;
 
 pub use arm64_const::*;
 pub use arm_const::*;
@@ -49,6 +45,8 @@ pub use mips_const::*;
 pub use sparc_const::*;
 pub use unicorn_const::*;
 pub use x86_const::*;
+pub use ffi::{uc_handle, uc_hook};
+pub use ffi::unicorn_const as unicorn_const;
 
 pub const BINDINGS_MAJOR: u32 = 1;
 pub const BINDINGS_MINOR: u32 = 0;
@@ -426,10 +424,6 @@ impl Cpu for CpuX86 {
     }
 }
 
-#[allow(non_camel_case_types)]
-pub type uc_handle = libc::size_t;
-#[allow(non_camel_case_types)]
-pub type uc_hook = libc::size_t;
 
 /// Struct to bind a unicorn instance to a callback.
 pub struct UnicornHook<F> {
@@ -503,12 +497,6 @@ pub struct Unicorn {
     insn_sys_callbacks: HashMap<uc_hook, Box<InsnSysHook>>,
 }
 
-impl Error {
-    pub fn msg(&self) -> String {
-        error_msg(*self)
-    }
-}
-
 /// Returns a tuple `(major, minor)` for the bindings version number.
 pub fn bindings_version() -> (u32, u32) {
     (BINDINGS_MAJOR, BINDINGS_MINOR)
@@ -526,14 +514,10 @@ pub fn unicorn_version() -> (u32, u32) {
     (major, minor)
 }
 
+
 /// Returns `true` if the architecture is supported by this build of unicorn.
 pub fn arch_supported(arch: Arch) -> bool {
     unsafe { uc_arch_supported(arch) }
-}
-
-/// Returns a string for the specified error code.
-pub fn error_msg(error: Error) -> String {
-    unsafe { CStr::from_ptr(uc_strerror(error)).to_string_lossy().into_owned() }
 }
 
 impl Unicorn {
