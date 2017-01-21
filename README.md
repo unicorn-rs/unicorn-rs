@@ -26,19 +26,20 @@ fn main() {
 This project has been tested on Linux. The bindings are built for the master version of the unicorn
 git (currently at 1.0).
 
-To use this package, first install unicorn from git :
-
-1. Clone unicorn from git with `git clone https://github.com/unicorn-engine/unicorn`.
-2. Build and install with `make.sh` and `make.sh install`.
+To use this package, first install the packages needed to build unicorn : gcc, make, git, python.
 
 Then simply add it as dependency to the Cargo.toml of your program.
 
 ```
 [dependencies]
-unicorn = "0.1.0"
+unicorn = "0.4.0"
 ```
 
 ## Changelog
+
+### 0.4.0
+
+unicorn is now compiled as part of the build process of unicorn-rs.
 
 ### 0.3.0
 
@@ -61,3 +62,4 @@ Contributors:
 - Richo Healey (@richo)
 - petevine for reviewing the project and adding tests
 - jschievink for his help with the API design
+- m4b for the build.rs script
