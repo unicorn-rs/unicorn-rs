@@ -7,7 +7,7 @@ repository = "https://github.com/ekse/unicorn-rs"
 documentation = "http://ekse.github.io/unicorn/"
 license = "GPL-2.0"
 readme = "README.md"
-include = ["src/*", "tests/*", "Cargo.toml", "COPYING", "README.md"]
+include = ["src/*", "Cargo.toml", "COPYING", "README.md", ".gitmodules"]
 build = "build.rs"
 links = "unicorn"
 
