@@ -1,11 +1,17 @@
 extern crate gcc;
 extern crate os_type;
+extern crate pkg_config;
 
 use std::path::Path;
 use std::process::Command;
 use std::env;
 
 fn main() {
+    if Command::new("pkg-config").output().is_ok()
+        && pkg_config::Config::new().atleast_version("1.0.0").probe("unicorn").is_ok() {
+        return;
+    }
+
     if !Path::new("unicorn/.git").exists() {
         let _ = Command::new("git")
             .args(&["submodule", "update", "--init", "--depth", "5"])
