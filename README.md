@@ -23,19 +23,24 @@ fn main() {
 
 ## Installation
 
-This project has been tested on Linux. The bindings are built for the master version of the unicorn
-git (currently at 1.0).
+This project has been tested on Linux and OS X. The bindings are built for version 1.0 of unicorn.
 
-To use this package, first install the packages needed to build unicorn : gcc, make, git, python.
+This package attempts to build unicorn if it is not already installed on the system. To build
+unicorn, the following tools are needed : gcc, make, git, python 2.7.
 
-Then simply add it as dependency to the Cargo.toml of your program.
+To use unicorn-rs, simply add it as dependency to the Cargo.toml of your program.
 
 ```
 [dependencies]
-unicorn = "0.4.0"
+unicorn = "0.6.0"
 ```
 
 ## Changelog
+
+### 0.6.0
+
+We now check if unicorn is installed on the system via pkg-tool and use that version if available.
+Otherwise unicorn is compiled when building the package.
 
 ### 0.4.0
 
@@ -43,8 +48,8 @@ unicorn is now compiled as part of the build process of unicorn-rs.
 
 ### 0.3.0
 
-The handling of callbacks has been modified, callbacks should be implemented using closures. See the
-tests for examples.
+The handling of callbacks has been modified, callbacks should be implemented using closures. See
+the tests for examples.
 
 - added support for interrupt, in/out and sysenter callbacks
 
