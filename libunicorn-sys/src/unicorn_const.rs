@@ -1,3 +1,5 @@
+#![allow(non_camel_case_types)]
+
 pub const SECOND_SCALE: u64 = 1000000;
 pub const MILISECOND_SCALE: u64 = 1000;
 

@@ -1,3 +1,5 @@
+#![allow(non_camel_case_types)]
+
 // ARM registers
 #[repr(C)]
 #[derive(PartialEq, Debug, Clone, Copy)]
