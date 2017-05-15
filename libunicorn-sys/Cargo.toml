@@ -17,6 +17,7 @@ exclude = [
 name = "libunicorn_sys"
 
 [build-dependencies]
+build-helper = "0.1"
 gcc = "0.3"
 os_type="0.6"
 pkg-config = "0.3"
