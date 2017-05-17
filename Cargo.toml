@@ -4,7 +4,7 @@ version = "0.7.0"
 authors = ["Sébastien Duquette <ekse.0x@gmail.com>"]
 description = "Rust bindings for the unicorn emulator"
 repository = "https://github.com/ekse/unicorn-rs"
-documentation = "http://ekse.github.io/unicorn/"
+documentation = "https://docs.rs/unicorn/"
 license = "GPL-2.0"
 readme = "README.md"
 
