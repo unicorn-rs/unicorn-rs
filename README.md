@@ -23,19 +23,25 @@ fn main() {
 
 ## Installation
 
-This project has been tested on Linux and OS X. The bindings are built for version 1.0 of unicorn.
+This project has been tested on Linux, OS X and Windows. The bindings are built for version 1.0 of
+unicorn.
 
 This package attempts to build unicorn if it is not already installed on the system. To build
-unicorn, the following tools are needed : gcc, make, git, python 2.7.
+unicorn on Linux and OS X, the following tools are needed : gcc, make, git, python 2.7. Visual
+Studio is needed on Windows.
 
 To use unicorn-rs, simply add it as dependency to the Cargo.toml of your program.
 
 ```
 [dependencies]
-unicorn = "0.6.0"
+unicorn = "0.7.0"
 ```
 
 ## Changelog
+
+### 0.7.0
+
+Windows is now supported (thanks to kichristensen).
 
 ### 0.6.0
 
@@ -65,6 +71,7 @@ Contributors:
 - Sébastien Duquette (@ekse)
 - Israel Hallé (@isra17) for redesigning the callbacks API
 - Richo Healey (@richo)
+- Kim Christensen (@kichristensen) for the Windows support
 - petevine for reviewing the project and adding tests
 - jschievink for his help with the API design
 - m4b for the build.rs script

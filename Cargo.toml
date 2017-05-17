@@ -1,6 +1,6 @@
 [package]
 name = "unicorn"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Sébastien Duquette <ekse.0x@gmail.com>"]
 description = "Rust bindings for the unicorn emulator"
 repository = "https://github.com/ekse/unicorn-rs"
@@ -14,4 +14,4 @@ gcc = "0.3"
 [dependencies]
 bitflags = "0.8"
 libc = "0.2"
-libunicorn-sys = { path = "libunicorn-sys", version = "0.6.0" }
+libunicorn-sys = { path = "libunicorn-sys", version = "0.7.0" }
