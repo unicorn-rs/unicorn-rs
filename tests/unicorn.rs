@@ -10,7 +10,7 @@ fn emulate_x86() {
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.reg_write(unicorn::RegisterX86::EAX, 123), Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::EAX), Ok((123)));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::EAX), Ok(123));
 
     // Attempt to write to memory before mapping it.
     assert_eq!(emu.mem_write(0x1000, &x86_code32),
@@ -29,8 +29,8 @@ fn emulate_x86() {
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok((11)));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok((49)));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok(11));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok(49));
 }
 
 #[test]
@@ -50,8 +50,8 @@ fn emulate_x86_negative_values() {
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
-    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::ECX), Ok((-9)));
-    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok((-51)));
+    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::ECX), Ok(-9));
+    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok(-51));
 }
 
 #[test]
@@ -149,7 +149,7 @@ fn x86_mem_callback() {
                              0x1000 + x86_code32.len() as u64,
                              10 * unicorn::SECOND_SCALE,
                              0x1000),
-               Err((unicorn::Error::READ_UNMAPPED)));
+               Err(unicorn::Error::READ_UNMAPPED));
 
     assert_eq!(expects, *mems_cell.borrow());
     assert_eq!(emu.remove_hook(hook), Ok(()));
@@ -256,7 +256,7 @@ fn emulate_arm() {
 
     let mut emu = CpuARM::new(unicorn::Mode::THUMB).expect("failed to instantiate emulator");
     assert_eq!(emu.reg_write(unicorn::RegisterARM::R1, 123), Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterARM::R1), Ok((123)));
+    assert_eq!(emu.reg_read(unicorn::RegisterARM::R1), Ok(123));
 
     // Attempt to write to memory before mapping it.
     assert_eq!(emu.mem_write(0x1000, &arm_code32),
@@ -277,8 +277,8 @@ fn emulate_arm() {
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterARM::SP), Ok((0)));
-    assert_eq!(emu.reg_read(unicorn::RegisterARM::R0), Ok((10)));
+    assert_eq!(emu.reg_read(unicorn::RegisterARM::SP), Ok(0));
+    assert_eq!(emu.reg_read(unicorn::RegisterARM::R0), Ok(10));
 }
 
 #[test]
@@ -296,7 +296,7 @@ fn emulate_mips() {
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterMIPS::AT), Ok((0x3456)));
+    assert_eq!(emu.reg_read(unicorn::RegisterMIPS::AT), Ok(0x3456));
 }
 
 #[test]
@@ -332,8 +332,8 @@ fn mem_map_ptr() {
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok((11)));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok((49)));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok(11));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok(49));
     assert_eq!(emu.mem_unmap(0x1000, 0x4000), Ok(()));
 
     // Use a Vec for the emulator memory.
@@ -357,7 +357,7 @@ fn mem_map_ptr() {
                              10 * unicorn::SECOND_SCALE,
                              1000),
                Ok(()));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok((11)));
-    assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok((49)));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok(11));
+    assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok(49));
     assert_eq!(emu.mem_unmap(0x1000, 0x4000), Ok(()));
 }

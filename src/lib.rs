@@ -702,7 +702,7 @@ impl Unicorn {
             unsafe {
                 bytes.set_len(size);
             }
-            Ok((bytes))
+            Ok(bytes)
         } else {
             Err(err)
         }
