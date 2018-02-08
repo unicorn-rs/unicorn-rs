@@ -319,7 +319,7 @@ fn mem_map_ptr() {
     assert_eq!(emu.mem_write(0x1000, &x86_code32),
                (Err(unicorn::Error::WRITE_UNMAPPED)));
 
-    assert_eq!(emu.mem_map_ptr(0x1000, 0x4000, unicorn::PROT_ALL, mem.as_mut_ptr()), Ok(()));
+    assert_eq!(unsafe {emu.mem_map_ptr(0x1000, 0x4000, unicorn::PROT_ALL, mem.as_mut_ptr())}, Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     assert_eq!(emu.mem_read(0x1000, x86_code32.len()),
                Ok(x86_code32.clone()));
@@ -344,7 +344,7 @@ fn mem_map_ptr() {
     assert_eq!(emu.mem_write(0x1000, &x86_code32),
                (Err(unicorn::Error::WRITE_UNMAPPED)));
 
-    assert_eq!(emu.mem_map_ptr(0x1000, 0x4000, unicorn::PROT_ALL, mem.as_mut_ptr()), Ok(()));
+    assert_eq!(unsafe {emu.mem_map_ptr(0x1000, 0x4000, unicorn::PROT_ALL, mem.as_mut_ptr())}, Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     assert_eq!(emu.mem_read(0x1000, x86_code32.len()),
                Ok(x86_code32.clone()));

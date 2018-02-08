@@ -128,10 +128,16 @@ pub trait Cpu {
 
     /// Map an existing memory region in the emulator at the specified address.
     ///
+    /// This function is marked unsafe because it is the responsibility of the caller to
+    /// ensure that `size` matches the size of the passed buffer, an invalid `size` value will
+    /// likely cause a crash in unicorn.
+    ///
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
+    ///
     /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
+    ///
     /// `ptr` is a pointer to the provided memory region that will be used by the emulator.
-    fn mem_map_ptr<T>(&self, address: u64, size: libc::size_t, perms: Protection, ptr: *mut T) -> Result<(), Error> {
+    unsafe fn mem_map_ptr<T>(&self, address: u64, size: libc::size_t, perms: Protection, ptr: *mut T) -> Result<(), Error> {
         self.emu().mem_map_ptr(address, size, perms, ptr)
     }
 
@@ -648,12 +654,18 @@ impl Unicorn {
 
     /// Map an existing memory region in the emulator at the specified address.
     ///
+    /// This function is marked unsafe because it is the responsibility of the caller to
+    /// ensure that `size` matches the size of the passed buffer, an invalid `size` value will
+    /// likely cause a crash in unicorn.
+    ///
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
+    ///
     /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
+    ///
     /// `ptr` is a pointer to the provided memory region that will be used by the emulator.
-    pub fn mem_map_ptr<T>(&self, address: u64, size: libc::size_t, perms: Protection, ptr: *mut T)
+    pub unsafe fn mem_map_ptr<T>(&self, address: u64, size: libc::size_t, perms: Protection, ptr: *mut T)
                        -> Result<(), Error> {
-        let err = unsafe { uc_mem_map_ptr(self.handle, address, size, perms.bits(), ptr as *mut libc::c_void) };
+        let err = uc_mem_map_ptr(self.handle, address, size, perms.bits(), ptr as *mut libc::c_void);
         if err == Error::OK {
             Ok(())
         } else {
