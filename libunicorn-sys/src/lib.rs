@@ -36,6 +36,12 @@ extern "C" {
                        size: libc::size_t)
                        -> Error;
     pub fn uc_mem_map(engine: uc_handle, address: u64, size: libc::size_t, perms: u32) -> Error;
+    pub fn uc_mem_map_ptr(engine: uc_handle,
+                          address: u64,
+                          size: libc::size_t,
+                          perms: u32,
+                          ptr: *mut libc::c_void)
+                          -> Error;
     pub fn uc_mem_unmap(engine: uc_handle, address: u64, size: libc::size_t) -> Error;
     pub fn uc_mem_protect(engine: uc_handle,
                           address: u64,
