@@ -126,6 +126,21 @@ pub trait Cpu {
         self.emu().mem_map(address, size, perms)
     }
 
+    /// Map an existing memory region in the emulator at the specified address.
+    ///
+    /// This function is marked unsafe because it is the responsibility of the caller to
+    /// ensure that `size` matches the size of the passed buffer, an invalid `size` value will
+    /// likely cause a crash in unicorn.
+    ///
+    /// `address` must be aligned to 4kb or this will return `Error::ARG`.
+    ///
+    /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
+    ///
+    /// `ptr` is a pointer to the provided memory region that will be used by the emulator.
+    unsafe fn mem_map_ptr<T>(&self, address: u64, size: libc::size_t, perms: Protection, ptr: *mut T) -> Result<(), Error> {
+        self.emu().mem_map_ptr(address, size, perms, ptr)
+    }
+
     /// Unmap a memory region.
     ///
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
@@ -637,6 +652,27 @@ impl Unicorn {
         }
     }
 
+    /// Map an existing memory region in the emulator at the specified address.
+    ///
+    /// This function is marked unsafe because it is the responsibility of the caller to
+    /// ensure that `size` matches the size of the passed buffer, an invalid `size` value will
+    /// likely cause a crash in unicorn.
+    ///
+    /// `address` must be aligned to 4kb or this will return `Error::ARG`.
+    ///
+    /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
+    ///
+    /// `ptr` is a pointer to the provided memory region that will be used by the emulator.
+    pub unsafe fn mem_map_ptr<T>(&self, address: u64, size: libc::size_t, perms: Protection, ptr: *mut T)
+                       -> Result<(), Error> {
+        let err = uc_mem_map_ptr(self.handle, address, size, perms.bits(), ptr as *mut libc::c_void);
+        if err == Error::OK {
+            Ok(())
+        } else {
+            Err(err)
+        }
+    }
+
     /// Unmap a memory region.
     ///
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
@@ -678,7 +714,7 @@ impl Unicorn {
             unsafe {
                 bytes.set_len(size);
             }
-            Ok((bytes))
+            Ok(bytes)
         } else {
             Err(err)
         }
