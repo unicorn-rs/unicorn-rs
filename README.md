@@ -38,10 +38,14 @@ To use unicorn-rs, simply add it as dependency to the Cargo.toml of your program
 
 ```
 [dependencies]
-unicorn = "0.7.0"
+unicorn = "0.8.0"
 ```
 
 ## Changelog
+
+### 0.8.0
+
+Added support for `mem_map_ptr`.
 
 ### 0.7.0
 
