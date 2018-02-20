@@ -3,6 +3,8 @@
 [![Cargo](https://img.shields.io/crates/v/unicorn.svg)](https://crates.io/crates/unicorn)
 [![Documentation](https://docs.rs/unicorn/badge.svg)](https://docs.rs/unicorn)
 
+**Looking for maintainers**: I am looking for new maintainers for the project. If you are interested, please open an issue or contact me by email at ekse.0x@gmail.com.
+
 Rust bindings for the [unicorn](http://www.unicorn-engine.org/) CPU emulator.
 
 ```rust
