@@ -45,11 +45,28 @@ pub use mips_const::*;
 pub use sparc_const::*;
 pub use unicorn_const::*;
 pub use x86_const::*;
-pub use ffi::{uc_handle, uc_hook};
+pub use ffi::{uc_handle, uc_hook, uc_context};
 pub use ffi::unicorn_const;
 
 pub const BINDINGS_MAJOR: u32 = 1;
 pub const BINDINGS_MINOR: u32 = 0;
+
+#[derive(Debug)]
+pub struct Context {
+    context: uc_context
+}
+
+impl Context {
+    pub fn new() -> Self { Context { context: 0 } }
+    pub fn is_initialized(&self) -> bool { self.context != 0 }
+}
+
+impl Drop for Context {
+    fn drop(&mut self) {
+        unsafe { uc_free(self.context) };
+    }
+}
+
 
 pub trait Register {
     fn to_i32(&self) -> i32;
@@ -109,7 +126,7 @@ pub trait Cpu {
     }
 
     /// Write an unsigned value register.
-    fn reg_write(&mut self, reg: Self::Reg, value: u64) -> Result<(), Error> {
+    fn reg_write(&self, reg: Self::Reg, value: u64) -> Result<(), Error> {
         self.emu().reg_write(reg.to_i32(), value)
     }
 
@@ -263,6 +280,8 @@ pub trait Cpu {
         self.mut_emu()
             .add_insn_sys_hook(insn_type, begin, end, callback)
     }
+
+
     /// Remove a hook.
     ///
     /// `hook` is the value returned by either `add_code_hook` or `add_mem_hook`.
@@ -285,6 +304,15 @@ pub trait Cpu {
     /// - `Query::MODE` : the current hardware mode.
     fn query(&self, query: Query) -> Result<usize, Error> {
         self.emu().query(query)
+    }
+
+    /// Save the CPU context into an opaque struct.
+    fn context_save(&self) -> Result<Context, Error> {
+        self.emu().context_save()
+    }
+
+    fn context_restore(&self, context: &Context) -> Result<(), Error> {
+        self.emu().context_restore(context)
     }
 }
 
@@ -1027,6 +1055,7 @@ impl Unicorn {
         }
     }
 
+    // (Currently only supports x86 architectures. TODO: Add support for ARM.)
     /// Add a "syscall" or "sysenter" instruction hook.
     pub fn add_insn_sys_hook<F>(
         &mut self,
@@ -1108,6 +1137,37 @@ impl Unicorn {
         let err = unsafe { uc_query(self.handle, query, p_result) };
         if err == Error::OK {
             Ok(result)
+        } else {
+            Err(err)
+        }
+    }
+
+    /// Save and return the current CPU Context, which can
+    /// later be passed to restore_context to roll back changes
+    /// in the emulator.
+    pub fn context_save(&self) -> Result<Context, Error> {
+        let mut context: uc_context = 0;
+        let p_context: *mut uc_context = &mut context;
+        
+        let err = unsafe { uc_context_alloc(self.handle, p_context) };
+        if err != Error::OK {
+            return Err(err) 
+        };
+        let err = unsafe { uc_context_save(self.handle, context) };
+        if err != Error::OK {   
+            return Err(err) 
+        };
+
+        Ok(Context{context})
+    }
+
+    /// Restore a saved context. This can be used to roll back changes in
+    /// a CPU's register state (but not memory), or to duplicate a register
+    /// state across multiple CPUs.
+    pub fn context_restore(&self, context: &Context) -> Result<(), Error> {
+        let err = unsafe {uc_context_restore(self.handle, context.context)};
+        if err == Error::OK {
+            Ok(())
         } else {
             Err(err)
         }

@@ -116,3 +116,4 @@ pub enum RegisterARM {
     S30 = 109,
     S31 = 110,
 }
+

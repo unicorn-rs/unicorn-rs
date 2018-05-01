@@ -12,12 +12,15 @@ use unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 pub type uc_handle = libc::size_t;
 #[allow(non_camel_case_types)]
 pub type uc_hook = libc::size_t;
+#[allow(non_camel_case_types)]
+pub type uc_context = libc::size_t;
 
 extern "C" {
     pub fn uc_version(major: *const u32, minor: *const u32) -> u32;
     pub fn uc_arch_supported(arch: Arch) -> bool;
     pub fn uc_open(arch: Arch, mode: Mode, engine: *mut uc_handle) -> Error;
     pub fn uc_close(engine: uc_handle) -> Error;
+    pub fn uc_free(mem: libc::size_t) -> Error;
     pub fn uc_errno(engine: uc_handle) -> Error;
     pub fn uc_strerror(error_code: Error) -> *const c_char;
     pub fn uc_reg_write(engine: uc_handle,
@@ -70,6 +73,9 @@ extern "C" {
                        -> Error;
     pub fn uc_hook_del(engine: uc_handle, hook: uc_hook) -> Error;
     pub fn uc_query(engine: uc_handle, query_type: Query, result: *mut libc::size_t) -> Error;
+    pub fn uc_context_alloc(engine: uc_handle, context: *mut uc_context) -> Error;
+    pub fn uc_context_save(engine: uc_handle, context: uc_context) -> Error;
+    pub fn uc_context_restore(engine: uc_handle, context: uc_context) -> Error;
 }
 
 

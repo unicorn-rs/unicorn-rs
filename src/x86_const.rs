@@ -253,6 +253,7 @@ pub enum InsnX86 {
     OUT = 500,
     SYSCALL = 699,
     SYSENTER = 700,
+    RET = 151,
 }
 
 #[repr(C)]
@@ -261,3 +262,5 @@ pub enum InsnSysX86 {
     SYSCALL = InsnX86::SYSCALL as isize,
     SYSENTER = InsnX86::SYSENTER as isize,
 }
+
+

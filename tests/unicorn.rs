@@ -4,11 +4,159 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use unicorn::{Cpu, CpuARM, CpuMIPS, CpuX86};
 
+pub static X86_REGISTERS: [unicorn::RegisterX86; 145] = [
+    unicorn::RegisterX86::AH,
+    unicorn::RegisterX86::AL,
+    unicorn::RegisterX86::AX,
+    unicorn::RegisterX86::BH,
+    unicorn::RegisterX86::BL,
+    unicorn::RegisterX86::BP,
+    unicorn::RegisterX86::BPL,
+    unicorn::RegisterX86::BX,
+    unicorn::RegisterX86::CH,
+    unicorn::RegisterX86::CL,
+    unicorn::RegisterX86::CS,
+    unicorn::RegisterX86::CX,
+    unicorn::RegisterX86::DH,
+    unicorn::RegisterX86::DI,
+    unicorn::RegisterX86::DIL,
+    unicorn::RegisterX86::DL,
+    unicorn::RegisterX86::DS,
+    unicorn::RegisterX86::DX,
+    unicorn::RegisterX86::EAX,
+    unicorn::RegisterX86::EBP,
+    unicorn::RegisterX86::EBX,
+    unicorn::RegisterX86::ECX,
+    unicorn::RegisterX86::EDI,
+    unicorn::RegisterX86::EDX,
+    unicorn::RegisterX86::EFLAGS,
+    unicorn::RegisterX86::EIP,
+    unicorn::RegisterX86::EIZ,
+    unicorn::RegisterX86::ES,
+    unicorn::RegisterX86::ESI,
+    unicorn::RegisterX86::ESP,
+    unicorn::RegisterX86::FPSW,
+    unicorn::RegisterX86::FS,
+    unicorn::RegisterX86::GS,
+    unicorn::RegisterX86::IP,
+    unicorn::RegisterX86::RAX,
+    unicorn::RegisterX86::RBP,
+    unicorn::RegisterX86::RBX,
+    unicorn::RegisterX86::RCX,
+    unicorn::RegisterX86::RDI,
+    unicorn::RegisterX86::RDX,
+    unicorn::RegisterX86::RIP,
+    unicorn::RegisterX86::RIZ,
+    unicorn::RegisterX86::RSI,
+    unicorn::RegisterX86::RSP,
+    unicorn::RegisterX86::SI,
+    unicorn::RegisterX86::SIL,
+    unicorn::RegisterX86::SP,
+    unicorn::RegisterX86::SPL,
+    unicorn::RegisterX86::SS,
+    unicorn::RegisterX86::CR0,
+    unicorn::RegisterX86::CR1,
+    unicorn::RegisterX86::CR2,
+    unicorn::RegisterX86::CR3,
+    unicorn::RegisterX86::CR4,
+    unicorn::RegisterX86::CR5,
+    unicorn::RegisterX86::CR6,
+    unicorn::RegisterX86::CR7,
+    unicorn::RegisterX86::CR8,
+    unicorn::RegisterX86::CR9,
+    unicorn::RegisterX86::CR10,
+    unicorn::RegisterX86::CR11,
+    unicorn::RegisterX86::CR12,
+    unicorn::RegisterX86::CR13,
+    unicorn::RegisterX86::CR14,
+    unicorn::RegisterX86::CR15,
+    unicorn::RegisterX86::DR0,
+    unicorn::RegisterX86::DR1,
+    unicorn::RegisterX86::DR2,
+    unicorn::RegisterX86::DR3,
+    unicorn::RegisterX86::DR4,
+    unicorn::RegisterX86::DR5,
+    unicorn::RegisterX86::DR6,
+    unicorn::RegisterX86::DR7,
+    unicorn::RegisterX86::DR8,
+    unicorn::RegisterX86::DR9,
+    unicorn::RegisterX86::DR10,
+    unicorn::RegisterX86::DR11,
+    unicorn::RegisterX86::DR12,
+    unicorn::RegisterX86::DR13,
+    unicorn::RegisterX86::DR14,
+    unicorn::RegisterX86::DR15,
+    unicorn::RegisterX86::FP0,
+    unicorn::RegisterX86::FP1,
+    unicorn::RegisterX86::FP2,
+    unicorn::RegisterX86::FP3,
+    unicorn::RegisterX86::FP4,
+    unicorn::RegisterX86::FP5,
+    unicorn::RegisterX86::FP6,
+    unicorn::RegisterX86::FP7,
+    unicorn::RegisterX86::K0,
+    unicorn::RegisterX86::K1,
+    unicorn::RegisterX86::K2,
+    unicorn::RegisterX86::K3,
+    unicorn::RegisterX86::K4,
+    unicorn::RegisterX86::K5,
+    unicorn::RegisterX86::K6,
+    unicorn::RegisterX86::K7,
+    unicorn::RegisterX86::MM0,
+    unicorn::RegisterX86::MM1,
+    unicorn::RegisterX86::MM2,
+    unicorn::RegisterX86::MM3,
+    unicorn::RegisterX86::MM4,
+    unicorn::RegisterX86::MM5,
+    unicorn::RegisterX86::MM6,
+    unicorn::RegisterX86::MM7,
+    unicorn::RegisterX86::R8,
+    unicorn::RegisterX86::R9,
+    unicorn::RegisterX86::R10,
+    unicorn::RegisterX86::R11,
+    unicorn::RegisterX86::R12,
+    unicorn::RegisterX86::R13,
+    unicorn::RegisterX86::R14,
+    unicorn::RegisterX86::R15,
+    unicorn::RegisterX86::ST0,
+    unicorn::RegisterX86::ST1,
+    unicorn::RegisterX86::ST2,
+    unicorn::RegisterX86::ST3,
+    unicorn::RegisterX86::ST4,
+    unicorn::RegisterX86::ST5,
+    unicorn::RegisterX86::ST6,
+    unicorn::RegisterX86::ST7,
+    unicorn::RegisterX86::R8B,
+    unicorn::RegisterX86::R9B,
+    unicorn::RegisterX86::R10B,
+    unicorn::RegisterX86::R11B,
+    unicorn::RegisterX86::R12B,
+    unicorn::RegisterX86::R13B,
+    unicorn::RegisterX86::R14B,
+    unicorn::RegisterX86::R15B,
+    unicorn::RegisterX86::R8D,
+    unicorn::RegisterX86::R9D,
+    unicorn::RegisterX86::R10D,
+    unicorn::RegisterX86::R11D,
+    unicorn::RegisterX86::R12D,
+    unicorn::RegisterX86::R13D,
+    unicorn::RegisterX86::R14D,
+    unicorn::RegisterX86::R15D,
+    unicorn::RegisterX86::R8W,
+    unicorn::RegisterX86::R9W,
+    unicorn::RegisterX86::R10W,
+    unicorn::RegisterX86::R11W,
+    unicorn::RegisterX86::R12W,
+    unicorn::RegisterX86::R13W,
+    unicorn::RegisterX86::R14W,
+    unicorn::RegisterX86::R15W,
+];
+
 #[test]
 fn emulate_x86() {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.reg_write(unicorn::RegisterX86::EAX, 123), Ok(()));
     assert_eq!(emu.reg_read(unicorn::RegisterX86::EAX), Ok(123));
 
@@ -320,7 +468,7 @@ fn x86_insn_sys_callback() {
 fn emulate_arm() {
     let arm_code32: Vec<u8> = vec![0x83, 0xb0]; // sub    sp, #0xc
 
-    let mut emu = CpuARM::new(unicorn::Mode::THUMB).expect("failed to instantiate emulator");
+    let emu = CpuARM::new(unicorn::Mode::THUMB).expect("failed to instantiate emulator");
     assert_eq!(emu.reg_write(unicorn::RegisterARM::R1, 123), Ok(()));
     assert_eq!(emu.reg_read(unicorn::RegisterARM::R1), Ok(123));
 
@@ -359,7 +507,7 @@ fn emulate_arm() {
 fn emulate_mips() {
     let mips_code32 = vec![0x56, 0x34, 0x21, 0x34]; // ori $at, $at, 0x3456;
 
-    let mut emu = CpuMIPS::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuMIPS::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &mips_code32), Ok(()));
     assert_eq!(
@@ -392,7 +540,7 @@ fn mem_map_ptr() {
     let mut mem: [u8; 4000] = [0; 4000];
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
 
     // Attempt to write to memory before mapping it.
     assert_eq!(
@@ -461,4 +609,32 @@ fn mem_map_ptr() {
     assert_eq!(emu.reg_read(unicorn::RegisterX86::ECX), Ok(11));
     assert_eq!(emu.reg_read(unicorn::RegisterX86::EDX), Ok(49));
     assert_eq!(emu.mem_unmap(0x1000, 0x4000), Ok(()));
+}
+
+#[test]
+fn x86_context_save_and_restore () {
+    for mode in vec![ unicorn::Mode::MODE_32, unicorn::Mode::MODE_64 ] {
+        let x86_code: Vec<u8> = vec![
+            0x48, 0xB8, 0xEF, 0xBE, 0xAD, 0xDE, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x05
+        ];
+        let emu = CpuX86::new(mode).expect("failed to instantiate emulator");
+        assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+        assert_eq!(emu.mem_write(0x1000, &x86_code), Ok(()));
+        let _ = emu.emu_start(0x1000,
+                              (0x1000 + x86_code.len()) as u64,
+                              10 * unicorn::SECOND_SCALE,
+                              1000);
+
+        /* now, save the context... */
+        let context = emu.context_save();
+        let context = context.unwrap();
+        
+        /* and create a new emulator, into which we will "restore" that context */
+        let emu2 = CpuX86::new(mode).expect("failed to instantiate emu2");
+        assert_eq!(emu2.context_restore(&context), Ok(()));
+        for register in X86_REGISTERS.iter() {
+            println!("Testing register {:?}", register);
+            assert_eq!(emu2.reg_read(*register), emu.reg_read(*register));
+        }
+    }
 }
