@@ -156,7 +156,7 @@ pub static X86_REGISTERS: [unicorn::RegisterX86; 145] = [
 fn emulate_x86() {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.reg_write(unicorn::RegisterX86::EAX, 123), Ok(()));
     assert_eq!(emu.reg_read(unicorn::RegisterX86::EAX), Ok(123));
 
@@ -193,7 +193,7 @@ fn emulate_x86() {
 fn emulate_x86_negative_values() {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
 
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
@@ -217,7 +217,7 @@ fn emulate_x86_negative_values() {
 fn callback_lifetime_init() -> unicorn::CpuX86 {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
@@ -258,7 +258,7 @@ fn x86_code_callback() {
 
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
@@ -286,7 +286,7 @@ fn x86_intr_callback() {
 
     let x86_code32: Vec<u8> = vec![0xcd, 0x80]; // INT 0x80;
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
@@ -335,7 +335,7 @@ fn x86_mem_callback() {
         0xB8, 0xEF, 0xBE, 0xAD, 0xDE, 0xA3, 0x00, 0x20, 0x00, 0x00, 0xA1, 0x00, 0x00, 0x01, 0x00
     ];
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
@@ -371,7 +371,7 @@ fn x86_insn_in_callback() {
 
     let x86_code32: Vec<u8> = vec![0xe5, 0x10]; // IN eax, 0x10;
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
@@ -405,7 +405,7 @@ fn x86_insn_out_callback() {
 
     let x86_code32: Vec<u8> = vec![0xb0, 0x32, 0xe6, 0x46]; // MOV al, 0x32; OUT  0x46, al;
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
@@ -444,7 +444,7 @@ fn x86_insn_sys_callback() {
         0x48, 0xB8, 0xEF, 0xBE, 0xAD, 0xDE, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x05
     ];
 
-    let mut emu = CpuX86::new(unicorn::Mode::MODE_64).expect("failed to instantiate emulator");
+    let mut emu = CpuX86::new(unicorn::MODE_64).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code), Ok(()));
 
@@ -468,7 +468,7 @@ fn x86_insn_sys_callback() {
 fn emulate_arm() {
     let arm_code32: Vec<u8> = vec![0x83, 0xb0]; // sub    sp, #0xc
 
-    let emu = CpuARM::new(unicorn::Mode::THUMB).expect("failed to instantiate emulator");
+    let emu = CpuARM::new(unicorn::MODE_THUMB).expect("failed to instantiate emulator");
     assert_eq!(emu.reg_write(unicorn::RegisterARM::R1, 123), Ok(()));
     assert_eq!(emu.reg_read(unicorn::RegisterARM::R1), Ok(123));
 
@@ -507,7 +507,7 @@ fn emulate_arm() {
 fn emulate_mips() {
     let mips_code32 = vec![0x56, 0x34, 0x21, 0x34]; // ori $at, $at, 0x3456;
 
-    let emu = CpuMIPS::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuMIPS::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &mips_code32), Ok(()));
     assert_eq!(
@@ -528,8 +528,13 @@ fn emulate_mips() {
 }
 
 #[test]
+fn mips32_big_endian() {
+    let _emu = CpuMIPS::new(unicorn::MODE_32 | unicorn::MODE_BIG_ENDIAN).expect("failed to intanciate emulator");
+}
+
+#[test]
 fn mem_unmapping() {
-    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_unmap(0x1000, 0x4000), Ok(()));
 }
@@ -540,7 +545,7 @@ fn mem_map_ptr() {
     let mut mem: [u8; 4000] = [0; 4000];
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
-    let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
+    let emu = CpuX86::new(unicorn::MODE_32).expect("failed to instantiate emulator");
 
     // Attempt to write to memory before mapping it.
     assert_eq!(
@@ -613,7 +618,7 @@ fn mem_map_ptr() {
 
 #[test]
 fn x86_context_save_and_restore () {
-    for mode in vec![ unicorn::Mode::MODE_32, unicorn::Mode::MODE_64 ] {
+    for mode in vec![ unicorn::MODE_32, unicorn::MODE_64 ] {
         let x86_code: Vec<u8> = vec![
             0x48, 0xB8, 0xEF, 0xBE, 0xAD, 0xDE, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x05
         ];

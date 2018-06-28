@@ -25,25 +25,26 @@ pub enum Arch {
 }
 
 // Mode type
+bitflags! {
 #[repr(C)]
-#[derive(PartialEq, Debug, Clone, Copy)]
-pub enum Mode {
-    LITTLE_ENDIAN = 0, // little-endian mode (default mode)
+pub flags Mode: u32 {
+    const MODE_LITTLE_ENDIAN = 0, // little-endian mode (default mode)
     // MODE_ARM = 0,    // 32-bit ARM
-    MODE_16 = 1 << 1, // 16-bit mode (X86)
-    MODE_32 = 1 << 2, // 32-bit mode (X86)
-    MODE_64 = 1 << 3, // 64-bit mode (X86, PPC)
-    THUMB = 1 << 4, // ARM's Thumb mode, including Thumb-2
-    MCLASS = 1 << 5, // ARM's Cortex-M series
-    V8 = 1 << 6, // ARMv8 A32 encodings for ARM
+    const MODE_16 = 1 << 1, // 16-bit mode (X86)
+    const MODE_32 = 1 << 2, // 32-bit mode (X86)
+    const MODE_64 = 1 << 3, // 64-bit mode (X86, PPC)
+    const MODE_THUMB = 1 << 4, // ARM's Thumb mode, including Thumb-2
+    const MODE_MCLASS = 1 << 5, // ARM's Cortex-M series
+    const MODE_V8 = 1 << 6, // ARMv8 A32 encodings for ARM
     // MICRO = 1 << 4, // MicroMips mode (MIPS)
     // MIPS3 = 1 << 5, // Mips III ISA
     // MIPS32R6 = 1 << 6, // Mips32r6 ISA
     // V9 = 1 << 4, // SparcV9 mode (Sparc)
     // QPX = 1 << 4, // Quad Processing eXtensions mode (PPC)
-    BIG_ENDIAN = 1 << 30, /* big-endian mode
+    const MODE_BIG_ENDIAN = 1 << 30, /* big-endian mode
                            * UC_MODE_MIPS32 = UC_MODE_32,    // Mips32 ISA (Mips)
                            * UC_MODE_MIPS64 = UC_MODE_64,    // Mips64 ISA (Mips) */
+    }
 }
 
 // All type of errors encountered by Unicorn API.
