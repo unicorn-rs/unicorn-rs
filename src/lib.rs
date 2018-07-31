@@ -24,7 +24,6 @@
 //! }
 //! ```
 //!
-extern crate libc;
 extern crate libunicorn_sys as ffi;
 
 pub mod arm64_const;
@@ -34,19 +33,20 @@ pub mod mips_const;
 pub mod sparc_const;
 pub mod x86_const;
 
-use ffi::*;
 use std::mem;
 use std::collections::HashMap;
 
-pub use arm64_const::*;
-pub use arm_const::*;
-pub use m68k_const::*;
-pub use mips_const::*;
-pub use sparc_const::*;
-pub use unicorn_const::*;
-pub use x86_const::*;
-pub use ffi::{uc_handle, uc_hook, uc_context};
-pub use ffi::unicorn_const;
+use crate::ffi::*;
+
+pub use crate::arm64_const::*;
+pub use crate::arm_const::*;
+pub use crate::m68k_const::*;
+pub use crate::mips_const::*;
+pub use crate::sparc_const::*;
+pub use crate::unicorn_const::*;
+pub use crate::x86_const::*;
+pub use crate::ffi::{uc_handle, uc_hook, uc_context};
+pub use crate::ffi::unicorn_const;
 
 pub const BINDINGS_MAJOR: u32 = 1;
 pub const BINDINGS_MINOR: u32 = 0;

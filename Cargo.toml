@@ -1,6 +1,7 @@
 [package]
 name = "unicorn"
 version = "0.8.0"
+edition = "2018"
 authors = ["Sébastien Duquette <ekse.0x@gmail.com>"]
 description = "Rust bindings for the unicorn emulator"
 repository = "https://github.com/ekse/unicorn-rs"
