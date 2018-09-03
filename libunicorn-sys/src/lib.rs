@@ -4,8 +4,11 @@ extern crate bitflags;
 
 pub mod unicorn_const;
 
-use std::ffi::CStr;
-use std::os::raw::c_char;
+use std::{
+    ffi::CStr, 
+    os::raw::c_char, 
+    error, fmt
+};
 use unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 
 #[allow(non_camel_case_types)]
@@ -88,4 +91,21 @@ impl Error {
 /// Returns a string for the specified error code.
 pub fn error_msg(error: Error) -> String {
     unsafe { CStr::from_ptr(uc_strerror(error)).to_string_lossy().into_owned() }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        use std::error::Error;
+        write!(fmt, "{}", self.description())
+    }
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        unsafe { CStr::from_ptr(uc_strerror(*self)).to_str().unwrap() }
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        None
+    }
 }
