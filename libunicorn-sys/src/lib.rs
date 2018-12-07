@@ -1,7 +1,3 @@
-extern crate libc;
-#[macro_use]
-extern crate bitflags;
-
 pub mod unicorn_const;
 
 use std::{
@@ -9,7 +5,8 @@ use std::{
     os::raw::c_char, 
     error, fmt
 };
-use unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
+
+use crate::unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 
 #[allow(non_camel_case_types)]
 pub type uc_handle = libc::size_t;
