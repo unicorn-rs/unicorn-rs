@@ -2,9 +2,8 @@
 
 pub mod unicorn_const;
 
-use core::fmt;
+use core::{fmt, slice};
 use libc::c_char;
-use null_terminated::NulStr;
 use crate::unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 
 #[allow(non_camel_case_types)]
@@ -79,18 +78,24 @@ extern "C" {
 
 
 impl Error {
-    pub fn msg(self) -> &'static NulStr {
-        unsafe { NulStr::new_unchecked(uc_strerror(self) as _) }
+    pub fn msg_str(self) -> &'static str {
+        unsafe {
+            let s = uc_strerror(self) as *const u8;
+            let mut p = s;
+            while 0 != *p { p = p.add(1); }
+            let l = p as usize - s as usize;
+            core::str::from_utf8(slice::from_raw_parts(s, l)).unwrap_or("")
+        }
     }
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result { self.msg().fmt(fmt) }
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result { self.msg_str().fmt(fmt) }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for Error {
-    fn description(&self) -> &str { &self.msg()[..] }
+    fn description(&self) -> &str { self.msg_str().as_bytes() }
 
     fn cause(&self) -> Option<&std::error::Error> { None }
 }
