@@ -1,11 +1,10 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 pub mod unicorn_const;
 
-use std::{
-    ffi::CStr, 
-    os::raw::c_char, 
-    error, fmt
-};
-
+use core::fmt;
+use libc::c_char;
+use null_terminated::NulStr;
 use crate::unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 
 #[allow(non_camel_case_types)]
@@ -80,29 +79,18 @@ extern "C" {
 
 
 impl Error {
-    pub fn msg(&self) -> String {
-        error_msg(*self)
+    pub fn msg(self) -> &'static NulStr {
+        unsafe { NulStr::new_unchecked(uc_strerror(self) as _) }
     }
-}
-
-/// Returns a string for the specified error code.
-pub fn error_msg(error: Error) -> String {
-    unsafe { CStr::from_ptr(uc_strerror(error)).to_string_lossy().into_owned() }
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        use std::error::Error;
-        write!(fmt, "{}", self.description())
-    }
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result { self.msg().fmt(fmt) }
 }
 
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        unsafe { CStr::from_ptr(uc_strerror(*self)).to_str().unwrap() }
-    }
+#[cfg(feature = "std")]
+impl std::error::Error for Error {
+    fn description(&self) -> &str { &self.msg()[..] }
 
-    fn cause(&self) -> Option<&error::Error> {
-        None
-    }
+    fn cause(&self) -> Option<&std::error::Error> { None }
 }
