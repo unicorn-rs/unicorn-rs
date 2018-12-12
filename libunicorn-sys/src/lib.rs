@@ -78,7 +78,7 @@ extern "C" {
 
 
 impl Error {
-    pub fn msg_str(self) -> &'static str {
+    pub fn msg(self) -> &'static str {
         unsafe {
             let s = uc_strerror(self) as *const u8;
             core::str::from_utf8(slice::from_raw_parts(s, cstr_len(s))).unwrap_or("")
@@ -93,12 +93,12 @@ unsafe fn cstr_len(s: *const u8) -> usize {
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result { self.msg_str().fmt(fmt) }
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result { self.msg().fmt(fmt) }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for Error {
-    fn description(&self) -> &str { self.msg_str().as_bytes() }
+    fn description(&self) -> &str { self.msg().as_bytes() }
 
     fn cause(&self) -> Option<&std::error::Error> { None }
 }

@@ -21,7 +21,7 @@ fn main() {
         .expect("failed to query hardware mode");
     println!("hardware mode : {}", hardware_mode);
 
-    println!("Sample error message : {}", unicorn::Error::HOOK.msg_str());
+    println!("Sample error message : {}", unicorn::Error::HOOK.msg());
 
     emu.mem_map(0x10000, 0x4000, unicorn::PROT_ALL)
         .expect("failed to map first memory region");
