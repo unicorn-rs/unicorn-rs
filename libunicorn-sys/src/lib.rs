@@ -81,12 +81,15 @@ impl Error {
     pub fn msg_str(self) -> &'static str {
         unsafe {
             let s = uc_strerror(self) as *const u8;
-            let mut p = s;
-            while 0 != *p { p = p.add(1); }
-            let l = p as usize - s as usize;
-            core::str::from_utf8(slice::from_raw_parts(s, l)).unwrap_or("")
+            core::str::from_utf8(slice::from_raw_parts(s, cstr_len(s))).unwrap_or("")
         }
     }
+}
+
+unsafe fn cstr_len(s: *const u8) -> usize {
+    let mut p = s;
+    while 0 != *p { p = p.add(1); }
+    p as usize - s as usize
 }
 
 impl fmt::Display for Error {
