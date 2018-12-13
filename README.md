@@ -9,15 +9,13 @@
 Rust bindings for the [unicorn](http://www.unicorn-engine.org/) CPU emulator.
 
 ```rust
-extern crate unicorn;
-
 use unicorn::{Cpu, CpuX86};
 
 fn main() {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
     let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    let _ = emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL);
+    let _ = emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL);
     let _ = emu.mem_write(0x1000, &x86_code32);
     let _ = emu.reg_write_i32(unicorn::RegisterX86::ECX, -10);
     let _ = emu.reg_write_i32(unicorn::RegisterX86::EDX, -50);
@@ -45,6 +43,17 @@ unicorn = "0.8.0"
 ```
 
 ## Changelog
+
+### 0.9
+
+Error now implements the Error trait (thanks to @tathanhdinh), the RESOURCE and EXCEPTION
+error cases are now supported (thanks to @endeav0r). The CPU context can now be
+saved and restored (thanks to @oblivia-simplex). You can find an example use in the
+test `x86_context_save_and_restore`, in tests/unicorn.rs. The ffi bindings crate 
+unicorn-sys is now no_std by default (thanks to @strake). Finally the crate was migrated
+to Rust edition 2018.
+
+Thank you again to all the contributors, your help is always appreciated.
 
 ### 0.8.0
 
@@ -86,3 +95,7 @@ Contributors:
 - petevine for reviewing the project and adding tests
 - jschievink for his help with the API design
 - m4b for the build.rs script
+- TA Thanh Dinh
+- Lucca Fraser (@oblivia-simplex)
+- Matthew Farkas-Dyck (@strake)
+- endeav0r 
