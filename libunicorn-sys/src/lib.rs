@@ -1,11 +1,9 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 pub mod unicorn_const;
 
-use std::{
-    ffi::CStr, 
-    os::raw::c_char, 
-    error, fmt
-};
-
+use core::{fmt, slice};
+use libc::c_char;
 use crate::unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 
 #[allow(non_camel_case_types)]
@@ -80,29 +78,27 @@ extern "C" {
 
 
 impl Error {
-    pub fn msg(&self) -> String {
-        error_msg(*self)
+    pub fn msg(self) -> &'static str {
+        unsafe {
+            let s = uc_strerror(self) as *const u8;
+            core::str::from_utf8(slice::from_raw_parts(s, cstr_len(s))).unwrap_or("")
+        }
     }
 }
 
-/// Returns a string for the specified error code.
-pub fn error_msg(error: Error) -> String {
-    unsafe { CStr::from_ptr(uc_strerror(error)).to_string_lossy().into_owned() }
+unsafe fn cstr_len(s: *const u8) -> usize {
+    let mut p = s;
+    while 0 != *p { p = p.add(1); }
+    p as usize - s as usize
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        use std::error::Error;
-        write!(fmt, "{}", self.description())
-    }
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result { self.msg().fmt(fmt) }
 }
 
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        unsafe { CStr::from_ptr(uc_strerror(*self)).to_str().unwrap() }
-    }
+#[cfg(feature = "std")]
+impl std::error::Error for Error {
+    fn description(&self) -> &str { self.msg().as_bytes() }
 
-    fn cause(&self) -> Option<&error::Error> {
-        None
-    }
+    fn cause(&self) -> Option<&std::error::Error> { None }
 }

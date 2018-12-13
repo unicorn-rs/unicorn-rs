@@ -26,4 +26,7 @@ pkg-config = "0.3"
 
 [dependencies]
 bitflags = "0.8"
-libc = "0.2"
+libc = { version = "0.2", default-features = false }
+
+[features]
+std = []
