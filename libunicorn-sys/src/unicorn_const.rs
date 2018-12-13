@@ -78,14 +78,21 @@ pub enum Error {
 
 bitflags! {
 #[repr(C)]
-pub flags Protection : u32 {
-        const PROT_NONE = 0,
-        const PROT_READ = 1,
-        const PROT_WRITE = 2,
-        const PROT_EXEC = 4,
-        const PROT_ALL = 7,
+pub struct Protection : u32 {
+        const NONE = 0;
+        const READ = 1;
+        const WRITE = 2;
+        const EXEC = 4;
+        const ALL = 7;
     }
 }
+
+// Map to the PROT_ constants to maintain backward compatibility.
+pub const PROT_NONE: Protection = Protection::NONE;
+pub const PROT_READ: Protection = Protection::READ;
+pub const PROT_WRITE: Protection = Protection::WRITE;
+pub const PROT_EXEC: Protection = Protection::EXEC;
+pub const PROT_ALL: Protection = Protection::ALL;
 
 #[repr(C)]
 #[derive(Debug, Clone)]

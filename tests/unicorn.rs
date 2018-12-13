@@ -166,7 +166,7 @@ fn emulate_x86() {
         (Err(unicorn::Error::WRITE_UNMAPPED))
     );
 
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     assert_eq!(
         emu.mem_read(0x1000, x86_code32.len()),
@@ -195,7 +195,7 @@ fn emulate_x86_negative_values() {
 
     let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
 
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     assert_eq!(emu.reg_write_i32(unicorn::RegisterX86::ECX, -10), Ok(()));
@@ -218,7 +218,7 @@ fn callback_lifetime_init() -> unicorn::CpuX86 {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     let callback = move |uc: &unicorn::Unicorn, _: u64, _: u32| {
@@ -259,7 +259,7 @@ fn x86_code_callback() {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     let hook = emu.add_code_hook(unicorn::CodeHookType::CODE, 0x1000, 0x2000, callback)
@@ -287,7 +287,7 @@ fn x86_intr_callback() {
     let x86_code32: Vec<u8> = vec![0xcd, 0x80]; // INT 0x80;
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     let hook = emu.add_intr_hook(callback)
@@ -336,7 +336,7 @@ fn x86_mem_callback() {
     ];
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     let hook = emu.add_mem_hook(unicorn::MemHookType::MEM_ALL, 0, std::u64::MAX, callback)
@@ -372,7 +372,7 @@ fn x86_insn_in_callback() {
     let x86_code32: Vec<u8> = vec![0xe5, 0x10]; // IN eax, 0x10;
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     let hook = emu.add_insn_in_hook(callback)
@@ -406,7 +406,7 @@ fn x86_insn_out_callback() {
     let x86_code32: Vec<u8> = vec![0xb0, 0x32, 0xe6, 0x46]; // MOV al, 0x32; OUT  0x46, al;
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
     let hook = emu.add_insn_out_hook(callback)
@@ -445,7 +445,7 @@ fn x86_insn_sys_callback() {
     ];
 
     let mut emu = CpuX86::new(unicorn::Mode::MODE_64).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code), Ok(()));
 
     let hook = emu.add_insn_sys_hook(unicorn::InsnSysX86::SYSCALL, 1, 0, callback)
@@ -508,7 +508,7 @@ fn emulate_mips() {
     let mips_code32 = vec![0x56, 0x34, 0x21, 0x34]; // ori $at, $at, 0x3456;
 
     let emu = CpuMIPS::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &mips_code32), Ok(()));
     assert_eq!(
         emu.mem_read(0x1000, mips_code32.len()),
@@ -530,7 +530,7 @@ fn emulate_mips() {
 #[test]
 fn mem_unmapping() {
     let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");
-    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+    assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_unmap(0x1000, 0x4000), Ok(()));
 }
 
@@ -549,7 +549,7 @@ fn mem_map_ptr() {
     );
 
     assert_eq!(
-        unsafe { emu.mem_map_ptr(0x1000, 0x4000, unicorn::PROT_ALL, mem.as_mut_ptr()) },
+        unsafe { emu.mem_map_ptr(0x1000, 0x4000, unicorn::Protection::ALL, mem.as_mut_ptr()) },
         Ok(())
     );
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
@@ -585,7 +585,7 @@ fn mem_map_ptr() {
     );
 
     assert_eq!(
-        unsafe { emu.mem_map_ptr(0x1000, 0x4000, unicorn::PROT_ALL, mem.as_mut_ptr()) },
+        unsafe { emu.mem_map_ptr(0x1000, 0x4000, unicorn::Protection::ALL, mem.as_mut_ptr()) },
         Ok(())
     );
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
@@ -618,7 +618,7 @@ fn x86_context_save_and_restore () {
             0x48, 0xB8, 0xEF, 0xBE, 0xAD, 0xDE, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x05
         ];
         let emu = CpuX86::new(mode).expect("failed to instantiate emulator");
-        assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
+        assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
         assert_eq!(emu.mem_write(0x1000, &x86_code), Ok(()));
         let _ = emu.emu_start(0x1000,
                               (0x1000 + x86_code.len()) as u64,
