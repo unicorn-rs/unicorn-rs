@@ -87,11 +87,21 @@ pub struct Protection : u32 {
     }
 }
 
-// Map to the PROT_ constants to maintain backward compatibility.
+
+#[deprecated]
+/// Use Protection::NONE instead.
 pub const PROT_NONE: Protection = Protection::NONE;
+#[deprecated]
+/// Use Protection::READ instead.
 pub const PROT_READ: Protection = Protection::READ;
+#[deprecated]
+/// Use Protection::WRITE instead.
 pub const PROT_WRITE: Protection = Protection::WRITE;
+#[deprecated]
+/// Use Protection::EXEC instead.
 pub const PROT_EXEC: Protection = Protection::EXEC;
+#[deprecated]
+/// Use Protection::ALL instead.
 pub const PROT_ALL: Protection = Protection::ALL;
 
 #[repr(C)]
