@@ -1,5 +1,4 @@
 extern crate build_helper;
-extern crate gcc;
 extern crate os_type;
 extern crate pkg_config;
 
@@ -76,7 +75,7 @@ fn main() {
     }
     let out_dir = env::var("OUT_DIR").unwrap();
 
-    let make_args = match os_type::current_platform() {
+    let make_args = match os_type::current_platform().os_type {
         os_type::OSType::OSX => ["macos-universal-no"],
         _ => [""],
     };
