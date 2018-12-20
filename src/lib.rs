@@ -72,41 +72,22 @@ pub trait Register {
     fn to_i32(&self) -> i32;
 }
 
-impl Register for RegisterARM {
-    fn to_i32(&self) -> i32 {
-        *self as i32
-    }
+macro_rules! implement_register {
+    ($reg_arch:ty) => {
+        impl Register for $reg_arch {
+            fn to_i32(&self) -> i32 {
+                *self as i32
+            }
+        }
+    };
 }
 
-impl Register for RegisterARM64 {
-    fn to_i32(&self) -> i32 {
-        *self as i32
-    }
-}
-
-impl Register for RegisterM68K {
-    fn to_i32(&self) -> i32 {
-        *self as i32
-    }
-}
-
-impl Register for RegisterMIPS {
-    fn to_i32(&self) -> i32 {
-        *self as i32
-    }
-}
-
-impl Register for RegisterSPARC {
-    fn to_i32(&self) -> i32 {
-        *self as i32
-    }
-}
-
-impl Register for RegisterX86 {
-    fn to_i32(&self) -> i32 {
-        *self as i32
-    }
-}
+implement_register!(RegisterARM);
+implement_register!(RegisterARM64);
+implement_register!(RegisterM68K);
+implement_register!(RegisterMIPS);
+implement_register!(RegisterSPARC);
+implement_register!(RegisterX86);
 
 pub trait Cpu {
     type Reg: Register;
@@ -1148,14 +1129,14 @@ impl Unicorn {
     pub fn context_save(&self) -> Result<Context, Error> {
         let mut context: uc_context = 0;
         let p_context: *mut uc_context = &mut context;
-        
+
         let err = unsafe { uc_context_alloc(self.handle, p_context) };
         if err != Error::OK {
-            return Err(err) 
+            return Err(err)
         };
         let err = unsafe { uc_context_save(self.handle, context) };
-        if err != Error::OK {   
-            return Err(err) 
+        if err != Error::OK {
+            return Err(err)
         };
 
         Ok(Context{context})
