@@ -1,11 +1,9 @@
-extern crate build_helper;
-extern crate os_type;
-extern crate pkg_config;
-
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::env;
-use std::ffi::{OsString, OsStr};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    env,
+    ffi::{OsString, OsStr},
+};
 
 use build_helper::rustc::{link_search, link_lib};
 
@@ -61,6 +59,8 @@ fn get_vcvars_path_and_platform() -> (OsString, &'static str) {
 }
 
 fn main() {
+    println!("cargo:rerun-if-changed=unicorn");
+
     if !build_helper::windows() {
         if Command::new("pkg-config").output().is_ok()
             && pkg_config::Config::new().atleast_version("1.0.0").probe("unicorn").is_ok() {

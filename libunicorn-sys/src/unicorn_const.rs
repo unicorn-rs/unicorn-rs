@@ -184,3 +184,6 @@ pub enum Query {
     /// The page size used by the emulator
     PAGE_SIZE,
 }
+
+pub const BINDINGS_MAJOR: u32 = 1;
+pub const BINDINGS_MINOR: u32 = 0;

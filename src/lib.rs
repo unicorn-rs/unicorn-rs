@@ -24,32 +24,32 @@
 //! }
 //! ```
 //!
-extern crate libunicorn_sys as ffi;
+use libunicorn_sys as ffi;
 
-pub mod arm64_const;
-pub mod arm_const;
-pub mod m68k_const;
-pub mod mips_const;
-pub mod sparc_const;
-pub mod x86_const;
+mod arm64_const;
+mod arm_const;
+mod m68k_const;
+mod mips_const;
+mod sparc_const;
+mod x86_const;
 
-use std::mem;
-use std::collections::HashMap;
+use std::{
+    mem,
+    collections::HashMap,
+};
 
-use crate::ffi::*;
-
-pub use crate::arm64_const::*;
-pub use crate::arm_const::*;
-pub use crate::m68k_const::*;
-pub use crate::mips_const::*;
-pub use crate::sparc_const::*;
-pub use crate::unicorn_const::*;
-pub use crate::x86_const::*;
-pub use crate::ffi::{uc_handle, uc_hook, uc_context};
-pub use crate::ffi::unicorn_const;
-
-pub const BINDINGS_MAJOR: u32 = 1;
-pub const BINDINGS_MINOR: u32 = 0;
+pub use crate::{
+    arm64_const::*,
+    arm_const::*,
+    m68k_const::*,
+    mips_const::*,
+    sparc_const::*,
+    ffi::{
+        unicorn_const::*,
+        *
+    },
+    x86_const::*,
+};
 
 #[derive(Debug)]
 pub struct Context {
@@ -579,7 +579,7 @@ impl Unicorn {
         let err = unsafe { uc_open(arch, mode, &mut handle) };
         if err == Error::OK {
             Ok(Box::new(Unicorn {
-                handle: handle,
+                handle,
                 code_callbacks: HashMap::default(),
                 intr_callbacks: HashMap::default(),
                 mem_callbacks: HashMap::default(),
