@@ -21,8 +21,8 @@ fn main() {
     let _ = emu.reg_write_i32(unicorn::RegisterX86::EDX, -50);
 
     let _ = emu.emu_start(0x1000, (0x1000 + x86_code32.len()) as u64, 10 * unicorn::SECOND_SCALE, 1000);
-    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::ECX), Ok((-9)));
-    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok((-51)));
+    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::ECX), Ok(-9));
+    assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok(-51));
 }
 ```
 
