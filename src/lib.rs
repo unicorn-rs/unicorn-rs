@@ -297,173 +297,61 @@ pub trait Cpu {
     }
 }
 
-/// An ARM emulator instance.
-pub struct CpuARM {
-    emu: Box<Unicorn>,
-}
-
-impl CpuARM {
-    /// Create an ARM emulator instance for the specified hardware mode.
-    pub fn new(mode: Mode) -> Result<CpuARM, Error> {
-        let emu = Unicorn::new(Arch::ARM, mode);
-        match emu {
-            Ok(x) => Ok(CpuARM { emu: x }),
-            Err(x) => Err(x),
+macro_rules! implement_emulator {
+    ($emu_type_doc:meta, $emu_instance_doc:meta, $cpu:ident, $arch:expr, $reg:ty) => {
+        #[$emu_type_doc]
+        pub struct $cpu {
+            emu: Box<Unicorn>,
         }
-    }
-}
 
-impl Cpu for CpuARM {
-    type Reg = RegisterARM;
-
-    fn emu(&self) -> &Unicorn {
-        &self.emu
-    }
-
-    fn mut_emu(&mut self) -> &mut Unicorn {
-        &mut self.emu
-    }
-}
-
-/// An ARM64 emulator instance.
-pub struct CpuARM64 {
-    emu: Box<Unicorn>,
-}
-
-impl CpuARM64 {
-    /// Create an ARM64 emulator instance for the specified hardware mode.
-    pub fn new(mode: Mode) -> Result<CpuARM64, Error> {
-        let emu = Unicorn::new(Arch::ARM64, mode);
-        match emu {
-            Ok(x) => Ok(CpuARM64 { emu: x }),
-            Err(x) => Err(x),
+        impl $cpu {
+            #[$emu_instance_doc]
+            pub fn new(mode: Mode) -> Result<Self, Error> {
+                let emu = Unicorn::new($arch, mode);
+                match emu {
+                    Ok(x) => Ok(Self { emu: x }),
+                    Err(x) => Err(x),
+                }
+            }
         }
-    }
-}
 
-impl Cpu for CpuARM64 {
-    type Reg = RegisterARM64;
+        impl Cpu for $cpu {
+            type Reg = $reg;
 
-    fn emu(&self) -> &Unicorn {
-        &self.emu
-    }
+            fn emu(&self) -> &Unicorn {
+                &self.emu
+            }
 
-    fn mut_emu(&mut self) -> &mut Unicorn {
-        &mut self.emu
-    }
-}
-
-/// A M68K emulator instance.
-pub struct CpuM68K {
-    emu: Box<Unicorn>,
-}
-
-impl CpuM68K {
-    /// Create a M68K emulator instance for the specified hardware mode.
-    pub fn new(mode: Mode) -> Result<CpuM68K, Error> {
-        let emu = Unicorn::new(Arch::M68K, mode);
-        match emu {
-            Ok(x) => Ok(CpuM68K { emu: x }),
-            Err(x) => Err(x),
+            fn mut_emu(&mut self) -> &mut Unicorn {
+                &mut self.emu
+            }
         }
-    }
+    };
 }
 
-impl Cpu for CpuM68K {
-    type Reg = RegisterM68K;
+implement_emulator!(doc="An ARM emulator instance.",
+                    doc="Create an ARM emulator instance for the specified hardware mode.",
+                    CpuARM, Arch::ARM, RegisterARM);
 
-    fn emu(&self) -> &Unicorn {
-        &self.emu
-    }
+implement_emulator!(doc="An ARM64 emulator instance.",
+                    doc="Create an ARM64 emulator instance for the specified hardware mode.",
+                    CpuARM64, Arch::ARM64, RegisterARM64);
 
-    fn mut_emu(&mut self) -> &mut Unicorn {
-        &mut self.emu
-    }
-}
+implement_emulator!(doc="A M68K emulator instance.",
+                    doc="Create a M68K emulator instance for the specified hardware mode.",
+                    CpuM68K, Arch::M68K, RegisterM68K);
 
-/// A MIPS emulator instance.
-pub struct CpuMIPS {
-    emu: Box<Unicorn>,
-}
+implement_emulator!(doc="A MIPS emulator instance.",
+                    doc="Create an MIPS emulator instance for the specified hardware mode.",
+                    CpuMIPS, Arch::MIPS, RegisterMIPS);
 
-impl CpuMIPS {
-    /// Create an MIPS emulator instance for the specified hardware mode.
-    pub fn new(mode: Mode) -> Result<CpuMIPS, Error> {
-        let emu = Unicorn::new(Arch::MIPS, mode);
-        match emu {
-            Ok(x) => Ok(CpuMIPS { emu: x }),
-            Err(x) => Err(x),
-        }
-    }
-}
+implement_emulator!(doc="A SPARC emulator instance.",
+                    doc="Create a SPARC emulator instance for the specified hardware mode.",
+                    CpuSPARC, Arch::SPARC, RegisterSPARC);
 
-impl Cpu for CpuMIPS {
-    type Reg = RegisterMIPS;
-
-    fn emu(&self) -> &Unicorn {
-        &self.emu
-    }
-
-    fn mut_emu(&mut self) -> &mut Unicorn {
-        &mut self.emu
-    }
-}
-
-/// A SPARC emulator instance.
-pub struct CpuSPARC {
-    emu: Box<Unicorn>,
-}
-
-impl CpuSPARC {
-    /// Create a SPARC emulator instance for the specified hardware mode.
-    pub fn new(mode: Mode) -> Result<CpuSPARC, Error> {
-        let emu = Unicorn::new(Arch::SPARC, mode);
-        match emu {
-            Ok(x) => Ok(CpuSPARC { emu: x }),
-            Err(x) => Err(x),
-        }
-    }
-}
-
-impl Cpu for CpuSPARC {
-    type Reg = RegisterSPARC;
-
-    fn emu(&self) -> &Unicorn {
-        &self.emu
-    }
-
-    fn mut_emu(&mut self) -> &mut Unicorn {
-        &mut self.emu
-    }
-}
-
-/// An X86 emulator instance.
-pub struct CpuX86 {
-    emu: Box<Unicorn>,
-}
-
-impl CpuX86 {
-    /// Create an X86 emulator instance for the specified hardware mode.
-    pub fn new(mode: Mode) -> Result<CpuX86, Error> {
-        let emu = Unicorn::new(Arch::X86, mode);
-        match emu {
-            Ok(x) => Ok(CpuX86 { emu: x }),
-            Err(x) => Err(x),
-        }
-    }
-}
-
-impl Cpu for CpuX86 {
-    type Reg = RegisterX86;
-
-    fn emu(&self) -> &Unicorn {
-        &self.emu
-    }
-
-    fn mut_emu(&mut self) -> &mut Unicorn {
-        &mut self.emu
-    }
-}
+implement_emulator!(doc="An X86 emulator instance.",
+                    doc="Create an X86 emulator instance for the specified hardware mode.",
+                    CpuX86, Arch::X86, RegisterX86);
 
 /// Struct to bind a unicorn instance to a callback.
 pub struct UnicornHook<F> {
@@ -550,10 +438,10 @@ pub fn bindings_version() -> (u32, u32) {
 
 /// Returns a tuple `(major, minor)` for the unicorn version number.
 pub fn unicorn_version() -> (u32, u32) {
-    let mut major: u32 = 0;
-    let mut minor: u32 = 0;
-    let p_major: *mut u32 = &mut major;
-    let p_minor: *mut u32 = &mut minor;
+    let mut major: u32 = Default::default();
+    let mut minor: u32 = Default::default();
+    let p_major: *mut _ = &mut major;
+    let p_minor: *mut _ = &mut minor;
     unsafe {
         uc_version(p_major, p_minor);
     }
@@ -575,17 +463,17 @@ impl Unicorn {
             return Err(Error::VERSION);
         }
 
-        let mut handle: libc::size_t = 0;
+        let mut handle: libc::size_t = Default::default();
         let err = unsafe { uc_open(arch, mode, &mut handle) };
         if err == Error::OK {
             Ok(Box::new(Unicorn {
                 handle,
-                code_callbacks: HashMap::default(),
-                intr_callbacks: HashMap::default(),
-                mem_callbacks: HashMap::default(),
-                insn_in_callbacks: HashMap::default(),
-                insn_out_callbacks: HashMap::default(),
-                insn_sys_callbacks: HashMap::default(),
+                code_callbacks: Default::default(),
+                intr_callbacks: Default::default(),
+                mem_callbacks: Default::default(),
+                insn_in_callbacks: Default::default(),
+                insn_out_callbacks: Default::default(),
+                insn_sys_callbacks: Default::default(),
             }))
         } else {
             Err(err)
