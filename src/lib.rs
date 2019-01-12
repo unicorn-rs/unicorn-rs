@@ -359,14 +359,23 @@ pub struct UnicornHook<F> {
     callback: F,
 }
 
+macro_rules! destructure_hook {
+    ($hook_type:path, $hook:ident) => {
+        {
+            let $hook_type { unicorn, ref mut callback } = unsafe { &mut *$hook };
+            (unsafe { &**unicorn }, callback)
+        }
+    };
+}
+
 extern "C" fn code_hook_proxy(_: uc_handle, address: u64, size: u32, user_data: *mut CodeHook) {
-    let code_hook = unsafe { &mut *user_data };
-    (code_hook.callback)(unsafe { &*code_hook.unicorn }, address, size);
+    let (unicorn, callback) = destructure_hook!(CodeHook, user_data);
+    callback(unicorn, address, size)
 }
 
 extern "C" fn intr_hook_proxy(_: uc_handle, intno: u32, user_data: *mut IntrHook) {
-    let intr_hook = unsafe { &mut *user_data };
-    (intr_hook.callback)(unsafe { &*intr_hook.unicorn }, intno);
+    let (unicorn, callback) = destructure_hook!(IntrHook, user_data);
+    callback(unicorn, intno)
 }
 
 extern "C" fn mem_hook_proxy(
@@ -377,14 +386,8 @@ extern "C" fn mem_hook_proxy(
     value: i64,
     user_data: *mut MemHook,
 ) -> bool {
-    let mem_hook = unsafe { &mut *user_data };
-    (mem_hook.callback)(
-        unsafe { &*mem_hook.unicorn },
-        mem_type,
-        address,
-        size,
-        value,
-    )
+    let (unicorn, callback) = destructure_hook!(MemHook, user_data);
+    callback(unicorn, mem_type, address, size, value)
 }
 
 extern "C" fn insn_in_hook_proxy(
@@ -393,8 +396,8 @@ extern "C" fn insn_in_hook_proxy(
     size: usize,
     user_data: *mut InsnInHook,
 ) -> u32 {
-    let insn_hook = unsafe { &mut *user_data };
-    (insn_hook.callback)(unsafe { &*insn_hook.unicorn }, port, size)
+    let (unicorn, callback) = destructure_hook!(InsnInHook, user_data);
+    callback(unicorn, port, size)
 }
 
 extern "C" fn insn_out_hook_proxy(
@@ -404,13 +407,13 @@ extern "C" fn insn_out_hook_proxy(
     value: u32,
     user_data: *mut InsnOutHook,
 ) {
-    let insn_hook = unsafe { &mut *user_data };
-    (insn_hook.callback)(unsafe { &*insn_hook.unicorn }, port, size, value);
+    let (unicorn, callback) = destructure_hook!(InsnOutHook, user_data);
+    callback(unicorn, port, size, value)
 }
 
 extern "C" fn insn_sys_hook_proxy(_: uc_handle, user_data: *mut InsnSysHook) {
-    let insn_hook = unsafe { &mut *user_data };
-    (insn_hook.callback)(unsafe { &*insn_hook.unicorn });
+    let (unicorn, callback) = destructure_hook!(InsnSysHook, user_data);
+    callback(unicorn)
 }
 
 type CodeHook = UnicornHook<Box<FnMut(&Unicorn, u64, u32)>>;
