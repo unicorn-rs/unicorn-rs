@@ -912,12 +912,13 @@ impl Unicorn {
     pub fn remove_hook(&mut self, hook: uc_hook) -> Result<()> {
         let err = unsafe { uc_hook_del(self.handle, hook) } as Error;
         // Check in all maps to find which one has the hook.
-        self.code_callbacks.remove(&hook);
-        self.intr_callbacks.remove(&hook);
-        self.mem_callbacks.remove(&hook);
-        self.insn_in_callbacks.remove(&hook);
-        self.insn_out_callbacks.remove(&hook);
-        self.insn_sys_callbacks.remove(&hook);
+        macro_rules! ignore { () => { |_| () } };
+        self.code_callbacks.remove(&hook).map(ignore!())
+            .or_else(|| self.intr_callbacks.remove(&hook).map(ignore!()))
+            .or_else(|| self.mem_callbacks.remove(&hook).map(ignore!()))
+            .or_else(|| self.insn_in_callbacks.remove(&hook).map(ignore!()))
+            .or_else(|| self.insn_out_callbacks.remove(&hook).map(ignore!()))
+            .or_else(|| self.insn_sys_callbacks.remove(&hook).map(ignore!()));
 
         if err == Error::OK {
             Ok(())
