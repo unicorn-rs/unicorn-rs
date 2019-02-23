@@ -154,8 +154,14 @@ pub trait Cpu {
     }
 
     /// Read a range of bytes from memory at the specified address.
-    fn mem_read(&self, address: u64, size: usize) -> Result<(Vec<u8>)> {
-        self.emu().mem_read(address, size)
+    fn mem_read(&self, address: u64, bytes: &mut [u8]) -> Result<()> {
+        self.emu().mem_read(address, bytes)
+    }
+
+    /// Read a range of bytes from memory at the specified address; return the bytes read as a
+    /// `Vec`.
+    fn mem_read_as_vec(&self, address: u64, size: usize) -> Result<Vec<u8>> {
+        self.emu().mem_read_as_vec(address, size)
     }
 
     /// Set the memory permissions for an existing memory region.
@@ -579,24 +585,30 @@ impl Unicorn {
     }
 
     /// Read a range of bytes from memory at the specified address.
-    pub fn mem_read(&self, address: u64, size: usize) -> Result<(Vec<u8>)> {
-        let mut bytes: Vec<u8> = Vec::with_capacity(size);
+    pub fn mem_read(&self, address: u64, bytes: &mut [u8]) -> Result<()> {
         let err = unsafe {
             uc_mem_read(
                 self.handle,
                 address,
                 bytes.as_mut_ptr(),
-                size as libc::size_t,
+                bytes.len(),
             )
         };
         if err == Error::OK {
-            unsafe {
-                bytes.set_len(size);
-            }
-            Ok(bytes)
+            Ok(())
         } else {
             Err(err)
         }
+    }
+
+    /// Read a range of bytes from memory at the specified address; return the bytes read as a
+    /// `Vec`.
+    pub fn mem_read_as_vec(&self, address: u64, size: usize) -> Result<Vec<u8>> {
+        let mut bytes: Vec<u8> = Vec::with_capacity(size);
+        unsafe { self.mem_read(address, bytes.get_unchecked_mut(0..size)) }.map(|()| unsafe {
+            bytes.set_len(size);
+            bytes
+        })
     }
 
     /// Set the memory permissions for an existing memory region.
