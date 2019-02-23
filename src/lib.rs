@@ -158,6 +158,12 @@ pub trait Cpu {
         self.emu().mem_read(address, bytes)
     }
 
+    /// Read a range of bytes from memory at the specified address; return the bytes read as a
+    /// `Vec`.
+    fn mem_read_as_vec(&self, address: u64, size: usize) -> Result<Vec<u8>> {
+        self.emu().mem_read_as_vec(address, size)
+    }
+
     /// Set the memory permissions for an existing memory region.
     ///
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
@@ -593,6 +599,16 @@ impl Unicorn {
         } else {
             Err(err)
         }
+    }
+
+    /// Read a range of bytes from memory at the specified address; return the bytes read as a
+    /// `Vec`.
+    pub fn mem_read_as_vec(&self, address: u64, size: usize) -> Result<Vec<u8>> {
+        let mut bytes: Vec<u8> = Vec::with_capacity(size);
+        unsafe { self.mem_read(address, bytes.get_unchecked_mut(0..size)) }.map(|()| unsafe {
+            bytes.set_len(size);
+            bytes
+        })
     }
 
     /// Set the memory permissions for an existing memory region.
