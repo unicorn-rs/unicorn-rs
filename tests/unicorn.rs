@@ -152,13 +152,6 @@ pub static X86_REGISTERS: [unicorn::RegisterX86; 145] = [
     unicorn::RegisterX86::R15W,
 ];
 
-macro_rules! read_to_vec {
-    ($l:expr, $f:expr) => ({
-        let mut xs = vec![0; $l];
-        $f(&mut xs[..]).map(|()| xs)
-    })
-}
-
 #[test]
 fn emulate_x86() {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
@@ -176,7 +169,7 @@ fn emulate_x86() {
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     assert_eq!(
-        read_to_vec!(x86_code32.len(), |bs| emu.mem_read(0x1000, bs)),
+        emu.mem_read_as_vec(0x1000, x86_code32.len()),
         Ok(x86_code32.clone())
     );
 
@@ -488,7 +481,7 @@ fn emulate_arm() {
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::PROT_ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &arm_code32), Ok(()));
     assert_eq!(
-        read_to_vec!(arm_code32.len(), |bs| emu.mem_read(0x1000, bs)),
+        emu.mem_read_as_vec(0x1000, arm_code32.len()),
         Ok(arm_code32.clone())
     );
 
@@ -518,7 +511,7 @@ fn emulate_mips() {
     assert_eq!(emu.mem_map(0x1000, 0x4000, unicorn::Protection::ALL), Ok(()));
     assert_eq!(emu.mem_write(0x1000, &mips_code32), Ok(()));
     assert_eq!(
-        read_to_vec!(mips_code32.len(), |bs| emu.mem_read(0x1000, bs)),
+        emu.mem_read_as_vec(0x1000, mips_code32.len()),
         Ok(mips_code32.clone())
     );
     assert_eq!(emu.reg_write(unicorn::RegisterMIPS::AT, 0), Ok(()));
@@ -561,7 +554,7 @@ fn mem_map_ptr() {
     );
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     assert_eq!(
-        read_to_vec!(x86_code32.len(), |bs| emu.mem_read(0x1000, bs)),
+        emu.mem_read_as_vec(0x1000, x86_code32.len()),
         Ok(x86_code32.clone())
     );
 
@@ -597,7 +590,7 @@ fn mem_map_ptr() {
     );
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
     assert_eq!(
-        read_to_vec!(x86_code32.len(), |bs| emu.mem_read(0x1000, bs)),
+        emu.mem_read_as_vec(0x1000, x86_code32.len()),
         Ok(x86_code32.clone())
     );
 
