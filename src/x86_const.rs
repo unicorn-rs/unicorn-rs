@@ -262,5 +262,3 @@ pub enum InsnSysX86 {
     SYSCALL = InsnX86::SYSCALL as isize,
     SYSENTER = InsnX86::SYSENTER as isize,
 }
-
-
