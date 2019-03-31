@@ -41,10 +41,11 @@ macro_rules! implement_emulator {
 }
 
 macro_rules! destructure_hook {
-    ($hook_type:path, $hook:ident) => {
-        {
-            let $hook_type { unicorn, ref mut callback } = unsafe { &mut *$hook };
-            (unsafe { &**unicorn }, callback)
-        }
-    };
+    ($hook_type:path, $hook:ident) => {{
+        let $hook_type {
+            unicorn,
+            ref mut callback,
+        } = unsafe { &mut *$hook };
+        (unsafe { &**unicorn }, callback)
+    }};
 }

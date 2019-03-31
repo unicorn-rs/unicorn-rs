@@ -36,21 +36,15 @@ mod x86_const;
 #[macro_use]
 mod macros;
 
-use std::{
-    mem,
-    collections::HashMap,
-};
+use std::{collections::HashMap, mem};
 
 pub use crate::{
     arm64_const::*,
     arm_const::*,
+    ffi::{unicorn_const::*, *},
     m68k_const::*,
     mips_const::*,
     sparc_const::*,
-    ffi::{
-        unicorn_const::*,
-        *
-    },
     x86_const::*,
 };
 
@@ -58,12 +52,16 @@ type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub struct Context {
-    context: uc_context
+    context: uc_context,
 }
 
 impl Context {
-    pub fn new() -> Self { Context { context: 0 } }
-    pub fn is_initialized(&self) -> bool { self.context != 0 }
+    pub fn new() -> Self {
+        Context { context: 0 }
+    }
+    pub fn is_initialized(&self) -> bool {
+        self.context != 0
+    }
 }
 
 impl Drop for Context {
@@ -71,7 +69,6 @@ impl Drop for Context {
         unsafe { uc_free(self.context) };
     }
 }
-
 
 pub trait Register {
     fn to_i32(&self) -> i32;
@@ -263,7 +260,6 @@ pub trait Cpu {
             .add_insn_sys_hook(insn_type, begin, end, callback)
     }
 
-
     /// Remove a hook.
     ///
     /// `hook` is the value returned by either `add_code_hook` or `add_mem_hook`.
@@ -298,29 +294,53 @@ pub trait Cpu {
     }
 }
 
-implement_emulator!(doc="An ARM emulator instance.",
-                    doc="Create an ARM emulator instance for the specified hardware mode.",
-                    CpuARM, Arch::ARM, RegisterARM);
+implement_emulator!(
+    doc = "An ARM emulator instance.",
+    doc = "Create an ARM emulator instance for the specified hardware mode.",
+    CpuARM,
+    Arch::ARM,
+    RegisterARM
+);
 
-implement_emulator!(doc="An ARM64 emulator instance.",
-                    doc="Create an ARM64 emulator instance for the specified hardware mode.",
-                    CpuARM64, Arch::ARM64, RegisterARM64);
+implement_emulator!(
+    doc = "An ARM64 emulator instance.",
+    doc = "Create an ARM64 emulator instance for the specified hardware mode.",
+    CpuARM64,
+    Arch::ARM64,
+    RegisterARM64
+);
 
-implement_emulator!(doc="A M68K emulator instance.",
-                    doc="Create a M68K emulator instance for the specified hardware mode.",
-                    CpuM68K, Arch::M68K, RegisterM68K);
+implement_emulator!(
+    doc = "A M68K emulator instance.",
+    doc = "Create a M68K emulator instance for the specified hardware mode.",
+    CpuM68K,
+    Arch::M68K,
+    RegisterM68K
+);
 
-implement_emulator!(doc="A MIPS emulator instance.",
-                    doc="Create an MIPS emulator instance for the specified hardware mode.",
-                    CpuMIPS, Arch::MIPS, RegisterMIPS);
+implement_emulator!(
+    doc = "A MIPS emulator instance.",
+    doc = "Create an MIPS emulator instance for the specified hardware mode.",
+    CpuMIPS,
+    Arch::MIPS,
+    RegisterMIPS
+);
 
-implement_emulator!(doc="A SPARC emulator instance.",
-                    doc="Create a SPARC emulator instance for the specified hardware mode.",
-                    CpuSPARC, Arch::SPARC, RegisterSPARC);
+implement_emulator!(
+    doc = "A SPARC emulator instance.",
+    doc = "Create a SPARC emulator instance for the specified hardware mode.",
+    CpuSPARC,
+    Arch::SPARC,
+    RegisterSPARC
+);
 
-implement_emulator!(doc="An X86 emulator instance.",
-                    doc="Create an X86 emulator instance for the specified hardware mode.",
-                    CpuX86, Arch::X86, RegisterX86);
+implement_emulator!(
+    doc = "An X86 emulator instance.",
+    doc = "Create an X86 emulator instance for the specified hardware mode.",
+    CpuX86,
+    Arch::X86,
+    RegisterX86
+);
 
 /// Struct to bind a unicorn instance to a callback.
 pub struct UnicornHook<F> {
@@ -508,12 +528,7 @@ impl Unicorn {
     ///
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
     /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
-    pub fn mem_map(
-        &self,
-        address: u64,
-        size: libc::size_t,
-        perms: Protection,
-    ) -> Result<()> {
+    pub fn mem_map(&self, address: u64, size: libc::size_t, perms: Protection) -> Result<()> {
         let err = unsafe { uc_mem_map(self.handle, address, size, perms.bits()) };
         if err == Error::OK {
             Ok(())
@@ -586,14 +601,7 @@ impl Unicorn {
 
     /// Read a range of bytes from memory at the specified address.
     pub fn mem_read(&self, address: u64, bytes: &mut [u8]) -> Result<()> {
-        let err = unsafe {
-            uc_mem_read(
-                self.handle,
-                address,
-                bytes.as_mut_ptr(),
-                bytes.len(),
-            )
-        };
+        let err = unsafe { uc_mem_read(self.handle, address, bytes.as_mut_ptr(), bytes.len()) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -658,13 +666,7 @@ impl Unicorn {
     /// is hit. `timeout` specifies a duration in microseconds after which the emulation is
     /// stopped (infinite execution if set to 0). `count` is the maximum number of instructions
     /// to emulate (emulate all the available instructions if set to 0).
-    pub fn emu_start(
-        &self,
-        begin: u64,
-        until: u64,
-        timeout: u64,
-        count: usize,
-    ) -> Result<()> {
+    pub fn emu_start(&self, begin: u64, until: u64, timeout: u64, count: usize) -> Result<()> {
         let err =
             unsafe { uc_emu_start(self.handle, begin, until, timeout, count as libc::size_t) };
         if err == Error::OK {
@@ -924,8 +926,14 @@ impl Unicorn {
     pub fn remove_hook(&mut self, hook: uc_hook) -> Result<()> {
         let err = unsafe { uc_hook_del(self.handle, hook) } as Error;
         // Check in all maps to find which one has the hook.
-        macro_rules! ignore { () => { |_| () } };
-        self.code_callbacks.remove(&hook).map(ignore!())
+        macro_rules! ignore {
+            () => {
+                |_| ()
+            };
+        };
+        self.code_callbacks
+            .remove(&hook)
+            .map(ignore!())
             .or_else(|| self.intr_callbacks.remove(&hook).map(ignore!()))
             .or_else(|| self.mem_callbacks.remove(&hook).map(ignore!()))
             .or_else(|| self.insn_in_callbacks.remove(&hook).map(ignore!()))
@@ -972,21 +980,21 @@ impl Unicorn {
 
         let err = unsafe { uc_context_alloc(self.handle, p_context) };
         if err != Error::OK {
-            return Err(err)
+            return Err(err);
         };
         let err = unsafe { uc_context_save(self.handle, context) };
         if err != Error::OK {
-            return Err(err)
+            return Err(err);
         };
 
-        Ok(Context{context})
+        Ok(Context { context })
     }
 
     /// Restore a saved context. This can be used to roll back changes in
     /// a CPU's register state (but not memory), or to duplicate a register
     /// state across multiple CPUs.
     pub fn context_restore(&self, context: &Context) -> Result<()> {
-        let err = unsafe {uc_context_restore(self.handle, context.context)};
+        let err = unsafe { uc_context_restore(self.handle, context.context) };
         if err == Error::OK {
             Ok(())
         } else {

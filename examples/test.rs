@@ -14,10 +14,12 @@ fn main() {
 
     let emu = CpuARM::new(unicorn::Mode::THUMB).expect("failed to create emulator");
 
-    let page_size = emu.query(unicorn::Query::PAGE_SIZE)
+    let page_size = emu
+        .query(unicorn::Query::PAGE_SIZE)
         .expect("failed to query page size");
     println!("page size : {}", page_size);
-    let hardware_mode = emu.query(unicorn::Query::MODE)
+    let hardware_mode = emu
+        .query(unicorn::Query::MODE)
         .expect("failed to query hardware mode");
     println!("hardware mode : {}", hardware_mode);
 
@@ -27,7 +29,8 @@ fn main() {
         .expect("failed to map first memory region");
     emu.mem_map(0x20000, 0x4000, unicorn::Protection::ALL)
         .expect("failed to map second memory region");
-    let regions = emu.mem_regions()
+    let regions = emu
+        .mem_regions()
         .expect("failed to retrieve memory mappings");
     println!("Regions : {}", regions.len());
 
