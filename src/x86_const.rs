@@ -244,6 +244,15 @@ pub enum RegisterX86 {
     R13W,
     R14W,
     R15W,
+    IDTR,
+    GDTR,
+    LDTR,
+    TR,
+    FPCW,
+    FPTAG,
+    MSR,
+    MXCSR,
+    ENDING
 }
 
 #[repr(C)]
