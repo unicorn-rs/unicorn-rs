@@ -277,5 +277,5 @@ pub struct X86Mmr {
     pub selector: u64,
     pub base: u64,
     pub limit: u32,
-    pub flags: u32
+    pub flags: u32,
 }
