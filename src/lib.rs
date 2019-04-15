@@ -99,8 +99,8 @@ pub trait Cpu {
     }
 
     /// Write a generic type to a register.
-    unsafe fn reg_write_generic<T: Sized>(&self, regid: i32, value: T) -> Result<()> {
-        self.emu().reg_write_generic(regid, value)
+    unsafe fn reg_write_generic<T: Sized>(&self, reg: Self::Reg, value: T) -> Result<()> {
+        self.emu().reg_write_generic(reg.to_i32(), value)
     }
 
     /// Write an unsigned value register.
