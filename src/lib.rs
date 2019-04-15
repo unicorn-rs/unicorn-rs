@@ -463,7 +463,7 @@ impl Unicorn {
         }
     }
 
-    unsafe fn reg_write_generic<T: Sized>(&self, regid: i32, value: T) -> Result<()> {
+    pub unsafe fn reg_write_generic<T: Sized>(&self, regid: i32, value: T) -> Result<()> {
         let p_value: *const T = &value;
         let err = uc_reg_write(self.handle, regid, p_value as *const libc::c_void);
         if err == Error::OK {
