@@ -274,7 +274,7 @@ pub enum InsnSysX86 {
 #[repr(C)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub struct X86Mmr {
-    pub selecter: u64,
+    pub selector: u64,
     pub base: u64,
     pub limit: u32,
     pub flags: u32
