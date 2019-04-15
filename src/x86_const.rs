@@ -252,7 +252,6 @@ pub enum RegisterX86 {
     FPTAG,
     MSR,
     MXCSR,
-    ENDING
 }
 
 #[repr(C)]
