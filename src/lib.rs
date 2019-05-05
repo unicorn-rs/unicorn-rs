@@ -98,6 +98,11 @@ pub trait Cpu {
         self.emu().reg_read_i32(reg.to_i32())
     }
 
+    /// Write a generic type to a register.
+    unsafe fn reg_write_generic<T: Sized>(&self, reg: Self::Reg, value: T) -> Result<()> {
+        self.emu().reg_write_generic(reg.to_i32(), value)
+    }
+
     /// Write an unsigned value register.
     fn reg_write(&self, reg: Self::Reg, value: u64) -> Result<()> {
         self.emu().reg_write(reg.to_i32(), value)
@@ -463,7 +468,11 @@ impl Unicorn {
         }
     }
 
-    unsafe fn reg_write_generic<T: Sized>(&self, regid: i32, value: T) -> Result<()> {
+    /// Write a generic type to a register.
+    ///
+    /// This is required in some special cases, such as when writing `X86Mmr` to
+    /// the GDTR register in x86.
+    pub unsafe fn reg_write_generic<T: Sized>(&self, regid: i32, value: T) -> Result<()> {
         let p_value: *const T = &value;
         let err = uc_reg_write(self.handle, regid, p_value as *const libc::c_void);
         if err == Error::OK {
