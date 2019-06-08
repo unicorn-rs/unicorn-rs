@@ -398,13 +398,13 @@ extern "C" fn insn_sys_hook_proxy(_: uc_handle, user_data: *mut InsnSysHook) {
     callback(unicorn)
 }
 
-type CodeHook<'a> = UnicornHook<'a, Box<'a + FnMut(&'a Unicorn<'a>, u64, u32)>>;
-type IntrHook<'a> = UnicornHook<'a, Box<'a + FnMut(&'a Unicorn<'a>, u32)>>;
+type CodeHook<'a> = UnicornHook<'a, Box<dyn 'a + FnMut(&'a Unicorn<'a>, u64, u32)>>;
+type IntrHook<'a> = UnicornHook<'a, Box<dyn 'a + FnMut(&'a Unicorn<'a>, u32)>>;
 type MemHook<'a> =
-    UnicornHook<'a, Box<'a + FnMut(&'a Unicorn<'a>, MemType, u64, usize, i64) -> bool>>;
-type InsnInHook<'a> = UnicornHook<'a, Box<'a + FnMut(&'a Unicorn<'a>, u32, usize) -> u32>>;
-type InsnOutHook<'a> = UnicornHook<'a, Box<'a + FnMut(&'a Unicorn<'a>, u32, usize, u32)>>;
-type InsnSysHook<'a> = UnicornHook<'a, Box<'a + FnMut(&'a Unicorn<'a>)>>;
+    UnicornHook<'a, Box<dyn 'a + FnMut(&'a Unicorn<'a>, MemType, u64, usize, i64) -> bool>>;
+type InsnInHook<'a> = UnicornHook<'a, Box<dyn 'a + FnMut(&'a Unicorn<'a>, u32, usize) -> u32>>;
+type InsnOutHook<'a> = UnicornHook<'a, Box<dyn 'a + FnMut(&'a Unicorn<'a>, u32, usize, u32)>>;
+type InsnSysHook<'a> = UnicornHook<'a, Box<dyn 'a + FnMut(&'a Unicorn<'a>)>>;
 
 /// Internal : A Unicorn emulator instance, use one of the Cpu structs instead.
 pub struct Unicorn<'a> {
@@ -425,12 +425,9 @@ pub fn bindings_version() -> (u32, u32) {
 
 /// Returns a tuple `(major, minor)` for the unicorn version number.
 pub fn unicorn_version() -> (u32, u32) {
-    let mut major: u32 = Default::default();
-    let mut minor: u32 = Default::default();
-    let p_major: *mut _ = &mut major;
-    let p_minor: *mut _ = &mut minor;
+    let (mut major, mut minor) = Default::default();
     unsafe {
-        uc_version(p_major, p_minor);
+        uc_version(&mut major, &mut minor);
     }
     (major, minor)
 }
@@ -473,8 +470,7 @@ impl<'a> Unicorn<'a> {
     /// This is required in some special cases, such as when writing `X86Mmr` to
     /// the GDTR register in x86.
     pub unsafe fn reg_write_generic<T: Sized>(&self, regid: i32, value: T) -> Result<()> {
-        let p_value: *const T = &value;
-        let err = uc_reg_write(self.handle, regid, p_value as *const libc::c_void);
+        let err = uc_reg_write(self.handle, regid, &value as *const _ as _);
         if err == Error::OK {
             Ok(())
         } else {
@@ -503,11 +499,7 @@ impl<'a> Unicorn<'a> {
     unsafe fn reg_read_generic<T: Sized>(&self, regid: i32) -> Result<T> {
         // deprecating in Rust 2.0.0: use mem::MaybeUninit::zeroed() instead
         let mut value: T = mem::zeroed();
-        let err = uc_reg_read(
-            self.handle,
-            regid as libc::c_int,
-            &mut value as *mut _ as *mut libc::c_void,
-        );
+        let err = uc_reg_read(self.handle, regid as _, &mut value as *mut _ as _);
         if err == Error::OK {
             Ok(value)
         } else {
@@ -564,13 +556,7 @@ impl<'a> Unicorn<'a> {
         perms: Protection,
         ptr: *mut T,
     ) -> Result<()> {
-        let err = uc_mem_map_ptr(
-            self.handle,
-            address,
-            size,
-            perms.bits(),
-            ptr as *mut libc::c_void,
-        );
+        let err = uc_mem_map_ptr(self.handle, address, size, perms.bits(), ptr as _);
         if err == Error::OK {
             Ok(())
         } else {
@@ -593,14 +579,7 @@ impl<'a> Unicorn<'a> {
 
     /// Write a range of bytes to memory at the specified address.
     pub fn mem_write(&self, address: u64, bytes: &[u8]) -> Result<()> {
-        let err = unsafe {
-            uc_mem_write(
-                self.handle,
-                address,
-                bytes.as_ptr(),
-                bytes.len() as libc::size_t,
-            )
-        };
+        let err = unsafe { uc_mem_write(self.handle, address, bytes.as_ptr(), bytes.len()) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -621,11 +600,9 @@ impl<'a> Unicorn<'a> {
     /// Read a range of bytes from memory at the specified address; return the bytes read as a
     /// `Vec`.
     pub fn mem_read_as_vec(&self, address: u64, size: usize) -> Result<Vec<u8>> {
-        let mut bytes: Vec<u8> = Vec::with_capacity(size);
-        unsafe { self.mem_read(address, bytes.get_unchecked_mut(0..size)) }.map(|()| unsafe {
-            bytes.set_len(size);
-            bytes
-        })
+        let mut bytes = vec![0; size];
+        self.mem_read(address, bytes.as_mut_slice())?;
+        Ok(bytes)
     }
 
     /// Set the memory permissions for an existing memory region.
@@ -633,8 +610,7 @@ impl<'a> Unicorn<'a> {
     /// `address` must be aligned to 4kb or this will return `Error::ARG`.
     /// `size` must be a multiple of 4kb or this will return `Error::ARG`.
     pub fn mem_protect(&self, address: u64, size: usize, perms: Protection) -> Result<()> {
-        let err =
-            unsafe { uc_mem_protect(self.handle, address, size as libc::size_t, perms.bits()) };
+        let err = unsafe { uc_mem_protect(self.handle, address, size as _, perms.bits()) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -647,22 +623,15 @@ impl<'a> Unicorn<'a> {
         // We make a copy of the MemRegion structs that are returned by uc_mem_regions()
         // as they have to be freed to the caller. It is simpler to make a copy and free()
         // the originals right away.
-        let mut nb_regions: u32 = 0;
-        let p_nb_regions: *mut u32 = &mut nb_regions;
+        let mut nb_regions: u32 = Default::default();
         let p_regions: *const MemRegion = std::ptr::null();
-        let pp_regions: *const *const MemRegion = &p_regions;
-        let err = unsafe { uc_mem_regions(self.handle, pp_regions, p_nb_regions) };
+        let err = unsafe { uc_mem_regions(self.handle, &p_regions as _, &mut nb_regions as _) };
         if err == Error::OK {
-            let mut regions: Vec<MemRegion> = Vec::new();
-            let mut i: isize = 0;
-            while i < nb_regions as isize {
-                unsafe {
-                    let region: MemRegion = mem::transmute_copy(&*p_regions.offset(i));
-                    regions.push(region);
-                }
-                i += 1;
+            let mut regions = Vec::new();
+            for i in 0..nb_regions as isize {
+                regions.push(unsafe { mem::transmute_copy(&*p_regions.offset(i)) });
             }
-            unsafe { libc::free(*pp_regions as *mut libc::c_void) };
+            unsafe { libc::free(p_regions as _) };
             Ok(regions)
         } else {
             Err(err)
@@ -676,8 +645,7 @@ impl<'a> Unicorn<'a> {
     /// stopped (infinite execution if set to 0). `count` is the maximum number of instructions
     /// to emulate (emulate all the available instructions if set to 0).
     pub fn emu_start(&self, begin: u64, until: u64, timeout: u64, count: usize) -> Result<()> {
-        let err =
-            unsafe { uc_emu_start(self.handle, begin, until, timeout, count as libc::size_t) };
+        let err = unsafe { uc_emu_start(self.handle, begin, until, timeout, count as _) };
         if err == Error::OK {
             Ok(())
         } else {
@@ -709,23 +677,19 @@ impl<'a> Unicorn<'a> {
     where
         F: 'a + FnMut(&'a Unicorn<'a>, u64, u32),
     {
-        let mut hook: uc_hook = 0;
-        let p_hook: *mut libc::size_t = &mut hook;
-
-        let user_data = Box::new(CodeHook {
+        let mut hook: uc_hook = Default::default();
+        let mut user_data = Box::new(CodeHook {
             unicorn: self,
             callback: Box::new(callback),
         });
-        let p_user_data: *mut libc::size_t = unsafe { mem::transmute(&*user_data) };
-        let _callback: libc::size_t = code_hook_proxy as usize;
 
         let err = unsafe {
             uc_hook_add(
                 self.handle,
-                p_hook,
+                &mut hook,
                 mem::transmute(hook_type),
-                _callback,
-                p_user_data,
+                code_hook_proxy as _,
+                user_data.as_mut() as *mut _ as _,
                 begin,
                 end,
             )
@@ -743,23 +707,19 @@ impl<'a> Unicorn<'a> {
     where
         F: 'a + FnMut(&'a Unicorn<'a>, u32),
     {
-        let mut hook: uc_hook = 0;
-        let p_hook: *mut libc::size_t = &mut hook;
-
-        let user_data = Box::new(IntrHook {
+        let mut hook: uc_hook = Default::default();
+        let mut user_data = Box::new(IntrHook {
             unicorn: self,
             callback: Box::new(callback),
         });
-        let p_user_data: *mut libc::size_t = unsafe { mem::transmute(&*user_data) };
-        let _callback: libc::size_t = intr_hook_proxy as usize;
 
         let err = unsafe {
             uc_hook_add(
                 self.handle,
-                p_hook,
+                &mut hook,
                 HookType::INTR,
-                _callback,
-                p_user_data,
+                intr_hook_proxy as _,
+                user_data.as_mut() as *mut _ as _,
                 0,
                 0,
             )
@@ -784,23 +744,19 @@ impl<'a> Unicorn<'a> {
     where
         F: 'a + FnMut(&'a Unicorn<'a>, MemType, u64, usize, i64) -> bool,
     {
-        let mut hook: uc_hook = 0;
-        let p_hook: *mut libc::size_t = &mut hook;
-
-        let user_data = Box::new(MemHook {
+        let mut hook: uc_hook = Default::default();
+        let mut user_data = Box::new(MemHook {
             unicorn: self,
             callback: Box::new(callback),
         });
-        let p_user_data: *mut libc::size_t = unsafe { mem::transmute(&*user_data) };
-        let _callback: libc::size_t = mem_hook_proxy as usize;
 
         let err = unsafe {
             uc_hook_add(
                 self.handle,
-                p_hook,
+                &mut hook,
                 mem::transmute(hook_type),
-                _callback,
-                p_user_data,
+                mem_hook_proxy as _,
+                user_data.as_mut() as *mut _ as _,
                 begin,
                 end,
             )
@@ -819,23 +775,19 @@ impl<'a> Unicorn<'a> {
     where
         F: 'a + FnMut(&'a Unicorn<'a>, u32, usize) -> u32,
     {
-        let mut hook: uc_hook = 0;
-        let p_hook: *mut libc::size_t = &mut hook;
-
-        let user_data = Box::new(InsnInHook {
+        let mut hook: uc_hook = Default::default();
+        let mut user_data = Box::new(InsnInHook {
             unicorn: self,
             callback: Box::new(callback),
         });
-        let p_user_data: *mut libc::size_t = unsafe { mem::transmute(&*user_data) };
-        let _callback: libc::size_t = insn_in_hook_proxy as usize;
 
         let err = unsafe {
             uc_hook_add(
                 self.handle,
-                p_hook,
+                &mut hook,
                 HookType::INSN,
-                _callback,
-                p_user_data,
+                insn_in_hook_proxy as _,
+                user_data.as_mut() as *mut _ as _,
                 0,
                 0,
                 x86_const::InsnX86::IN,
@@ -855,23 +807,19 @@ impl<'a> Unicorn<'a> {
     where
         F: 'a + FnMut(&'a Unicorn<'a>, u32, usize, u32),
     {
-        let mut hook: uc_hook = 0;
-        let p_hook: *mut libc::size_t = &mut hook;
-
-        let user_data = Box::new(InsnOutHook {
+        let mut hook: uc_hook = Default::default();
+        let mut user_data = Box::new(InsnOutHook {
             unicorn: self,
             callback: Box::new(callback),
         });
-        let p_user_data: *mut libc::size_t = unsafe { mem::transmute(&*user_data) };
-        let _callback: libc::size_t = insn_out_hook_proxy as usize;
 
         let err = unsafe {
             uc_hook_add(
                 self.handle,
-                p_hook,
+                &mut hook,
                 HookType::INSN,
-                _callback,
-                p_user_data,
+                insn_out_hook_proxy as _,
+                user_data.as_mut() as *mut _ as _,
                 0,
                 0,
                 x86_const::InsnX86::OUT,
@@ -898,23 +846,19 @@ impl<'a> Unicorn<'a> {
     where
         F: 'a + FnMut(&'a Unicorn<'a>),
     {
-        let mut hook: uc_hook = 0;
-        let p_hook: *mut libc::size_t = &mut hook;
-
-        let user_data = Box::new(InsnSysHook {
+        let mut hook: uc_hook = Default::default();
+        let mut user_data = Box::new(InsnSysHook {
             unicorn: self,
             callback: Box::new(callback),
         });
-        let p_user_data: *mut libc::size_t = unsafe { mem::transmute(user_data.as_ref()) };
-        let _callback: libc::size_t = insn_sys_hook_proxy as usize;
 
         let err = unsafe {
             uc_hook_add(
                 self.handle,
-                p_hook,
+                &mut hook,
                 HookType::INSN,
-                _callback,
-                p_user_data,
+                insn_sys_hook_proxy as _,
+                user_data.as_mut() as *mut _ as _,
                 begin,
                 end,
                 insn_type,
@@ -991,9 +935,8 @@ impl<'a> Unicorn<'a> {
     /// - `Query::PAGE_SIZE` : the page size used by the emulator.
     /// - `Query::MODE` : the current hardware mode.
     pub fn query(&self, query: Query) -> Result<usize> {
-        let mut result: libc::size_t = 0;
-        let p_result: *mut libc::size_t = &mut result;
-        let err = unsafe { uc_query(self.handle, query, p_result) };
+        let mut result: libc::size_t = Default::default();
+        let err = unsafe { uc_query(self.handle, query, &mut result) };
         if err == Error::OK {
             Ok(result)
         } else {
@@ -1005,10 +948,8 @@ impl<'a> Unicorn<'a> {
     /// later be passed to restore_context to roll back changes
     /// in the emulator.
     pub fn context_save(&self) -> Result<Context> {
-        let mut context: uc_context = 0;
-        let p_context: *mut uc_context = &mut context;
-
-        let err = unsafe { uc_context_alloc(self.handle, p_context) };
+        let mut context: uc_context = Default::default();
+        let err = unsafe { uc_context_alloc(self.handle, &mut context) };
         if err != Error::OK {
             return Err(err);
         };
@@ -1033,7 +974,7 @@ impl<'a> Unicorn<'a> {
     }
 }
 
-impl<'a> Drop for Unicorn<'a> {
+impl Drop for Unicorn<'_> {
     fn drop(&mut self) {
         unsafe { uc_close(self.handle) };
     }

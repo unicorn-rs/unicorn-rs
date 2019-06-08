@@ -220,7 +220,7 @@ fn emulate_x86_negative_values() {
     assert_eq!(emu.reg_read_i32(unicorn::RegisterX86::EDX), Ok(-51));
 }
 
-fn callback_lifetime_init() -> unicorn::CpuX86<'static> {
+fn callback_lifetime_init<'a>() -> unicorn::CpuX86<'a> {
     let x86_code32: Vec<u8> = vec![0x41, 0x4a]; // INC ecx; DEC edx
 
     let emu = CpuX86::new(unicorn::Mode::MODE_32).expect("failed to instantiate emulator");

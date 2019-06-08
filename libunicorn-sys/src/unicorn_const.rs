@@ -129,7 +129,7 @@ pub enum MemType {
     FETCH_PROT, // Fetch from non-executable, but mapped, memory
 }
 
-#[repr(C)]
+#[repr(i32)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum HookType {
     INTR = 1 << 0, // Hook all interrupt/syscall events
@@ -147,14 +147,14 @@ pub enum HookType {
     MEM_FETCH = 1 << 12, // Hook memory fetch for execution events
 }
 
-#[repr(C)]
+#[repr(i32)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum CodeHookType {
     CODE = 1 << 2, // Hook a range of code
     BLOCK = 1 << 3, // Hook basic blocks
 }
 
-#[repr(C)]
+#[repr(i32)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum MemHookType {
     MEM_READ_UNMAPPED = 1 << 4, // Hook for memory read on unmapped memory
