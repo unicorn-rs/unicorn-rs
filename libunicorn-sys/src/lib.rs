@@ -96,12 +96,4 @@ impl fmt::Display for Error {
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for Error {
-    fn description(&self) -> &str {
-        self.msg().as_bytes()
-    }
-
-    fn cause(&self) -> Option<&std::error::Error> {
-        None
-    }
-}
+impl std::error::Error for Error {}
