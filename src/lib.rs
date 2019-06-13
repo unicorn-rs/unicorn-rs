@@ -24,6 +24,9 @@
 //! }
 //! ```
 //!
+
+#![deny(rust_2018_idioms)]
+
 use libunicorn_sys as ffi;
 
 mod arm64_const;
@@ -212,7 +215,7 @@ pub trait Cpu<'a> {
     /// Add an interrupt hook.
     fn add_intr_hook<F>(&self, callback: F) -> Result<uc_hook>
     where
-        F: 'a + FnMut(&Unicorn, u32),
+        F: 'a + FnMut(&Unicorn<'_>, u32),
     {
         self.emu().add_intr_hook(callback)
     }
@@ -350,12 +353,12 @@ pub struct UnicornHook<'a, F: 'a> {
     callback: F,
 }
 
-extern "C" fn code_hook_proxy(_: uc_handle, address: u64, size: u32, user_data: *mut CodeHook) {
+extern "C" fn code_hook_proxy(_: uc_handle, address: u64, size: u32, user_data: *mut CodeHook<'_>) {
     let (unicorn, callback) = destructure_hook!(CodeHook, user_data);
     callback(unicorn, address, size)
 }
 
-extern "C" fn intr_hook_proxy(_: uc_handle, intno: u32, user_data: *mut IntrHook) {
+extern "C" fn intr_hook_proxy(_: uc_handle, intno: u32, user_data: *mut IntrHook<'_>) {
     let (unicorn, callback) = destructure_hook!(IntrHook, user_data);
     callback(unicorn, intno)
 }
@@ -366,7 +369,7 @@ extern "C" fn mem_hook_proxy(
     address: u64,
     size: usize,
     value: i64,
-    user_data: *mut MemHook,
+    user_data: *mut MemHook<'_>,
 ) -> bool {
     let (unicorn, callback) = destructure_hook!(MemHook, user_data);
     callback(unicorn, mem_type, address, size, value)
@@ -376,7 +379,7 @@ extern "C" fn insn_in_hook_proxy(
     _: uc_handle,
     port: u32,
     size: usize,
-    user_data: *mut InsnInHook,
+    user_data: *mut InsnInHook<'_>,
 ) -> u32 {
     let (unicorn, callback) = destructure_hook!(InsnInHook, user_data);
     callback(unicorn, port, size)
@@ -387,13 +390,13 @@ extern "C" fn insn_out_hook_proxy(
     port: u32,
     size: usize,
     value: u32,
-    user_data: *mut InsnOutHook,
+    user_data: *mut InsnOutHook<'_>,
 ) {
     let (unicorn, callback) = destructure_hook!(InsnOutHook, user_data);
     callback(unicorn, port, size, value)
 }
 
-extern "C" fn insn_sys_hook_proxy(_: uc_handle, user_data: *mut InsnSysHook) {
+extern "C" fn insn_sys_hook_proxy(_: uc_handle, user_data: *mut InsnSysHook<'_>) {
     let (unicorn, callback) = destructure_hook!(InsnSysHook, user_data);
     callback(unicorn)
 }

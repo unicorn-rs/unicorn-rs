@@ -1,3 +1,4 @@
+#![deny(rust_2018_idioms)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod unicorn_const;
@@ -94,7 +95,7 @@ unsafe fn cstr_len(s: *const u8) -> usize {
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.msg().fmt(fmt)
     }
 }

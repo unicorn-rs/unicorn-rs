@@ -1,4 +1,4 @@
-extern crate unicorn;
+#![deny(rust_2018_idioms)]
 
 use unicorn::{Cpu, CpuARM};
 
