@@ -4,6 +4,13 @@ version = "0.9.0"
 authors = ["Sébastien Duquette <ekse.0x@gmail.com>"]
 documentation = "https://docs.rs/unicorn/"
 edition = "2018"
+include = [
+    "/.gitmodules",
+    "/COPYING",
+    "/Cargo.toml",
+    "/README.md",
+    "/src/*",
+]
 license = "GPL-2.0"
 readme = "README.md"
 repository = "https://github.com/ekse/unicorn-rs"
