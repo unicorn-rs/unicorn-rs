@@ -3,7 +3,7 @@
 pub mod unicorn_const;
 
 use core::{fmt, slice};
-use libc::c_char;
+use libc::{c_char, c_int, c_void};
 use crate::unicorn_const::{Arch, MemRegion, Mode, Error, HookType, Query};
 
 #[allow(non_camel_case_types)]
@@ -14,7 +14,7 @@ pub type uc_hook = libc::size_t;
 pub type uc_context = libc::size_t;
 
 extern "C" {
-    pub fn uc_version(major: *const u32, minor: *const u32) -> u32;
+    pub fn uc_version(major: *mut u32, minor: *mut u32) -> u32;
     pub fn uc_arch_supported(arch: Arch) -> bool;
     pub fn uc_open(arch: Arch, mode: Mode, engine: *mut uc_handle) -> Error;
     pub fn uc_close(engine: uc_handle) -> Error;
@@ -22,10 +22,10 @@ extern "C" {
     pub fn uc_errno(engine: uc_handle) -> Error;
     pub fn uc_strerror(error_code: Error) -> *const c_char;
     pub fn uc_reg_write(engine: uc_handle,
-                        regid: libc::c_int,
-                        value: *const libc::c_void)
+                        regid: c_int,
+                        value: *const c_void)
                         -> Error;
-    pub fn uc_reg_read(engine: uc_handle, regid: libc::c_int, value: *mut libc::c_void) -> Error;
+    pub fn uc_reg_read(engine: uc_handle, regid: c_int, value: *mut c_void) -> Error;
     pub fn uc_mem_write(engine: uc_handle,
                         address: u64,
                         bytes: *const u8,
@@ -41,7 +41,7 @@ extern "C" {
                           address: u64,
                           size: libc::size_t,
                           perms: u32,
-                          ptr: *mut libc::c_void)
+                          ptr: *mut c_void)
                           -> Error;
     pub fn uc_mem_unmap(engine: uc_handle, address: u64, size: libc::size_t) -> Error;
     pub fn uc_mem_protect(engine: uc_handle,
