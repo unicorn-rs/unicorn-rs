@@ -86,20 +86,15 @@ pub struct Protection : u32 {
     }
 }
 
-#[deprecated]
-/// Use Protection::NONE instead.
+#[deprecated = "use `Protection::NONE` instead"]
 pub const PROT_NONE: Protection = Protection::NONE;
-#[deprecated]
-/// Use Protection::READ instead.
+#[deprecated = "use `Protection::READ` instead"]
 pub const PROT_READ: Protection = Protection::READ;
-#[deprecated]
-/// Use Protection::WRITE instead.
+#[deprecated = "use `Protection::WRITE` instead"]
 pub const PROT_WRITE: Protection = Protection::WRITE;
-#[deprecated]
-/// Use Protection::EXEC instead.
+#[deprecated = "use `Protection::EXEC` instead"]
 pub const PROT_EXEC: Protection = Protection::EXEC;
-#[deprecated]
-/// Use Protection::ALL instead.
+#[deprecated = "use `Protection::ALL` instead"]
 pub const PROT_ALL: Protection = Protection::ALL;
 
 #[repr(C)]
