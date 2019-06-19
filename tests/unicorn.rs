@@ -1,4 +1,4 @@
-extern crate unicorn;
+#![deny(rust_2018_idioms)]
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -230,7 +230,7 @@ fn callback_lifetime_init<'a>() -> unicorn::CpuX86<'a> {
     );
     assert_eq!(emu.mem_write(0x1000, &x86_code32), Ok(()));
 
-    let callback = |uc: &unicorn::Unicorn, _: u64, _: u32| {
+    let callback = |uc: &unicorn::Unicorn<'_>, _: u64, _: u32| {
         let ecx = uc.reg_read(unicorn::RegisterX86::ECX as i32).unwrap();
         println!("ecx: {}", ecx);
     };
@@ -260,7 +260,7 @@ fn x86_code_callback() {
     let codes_cell = Rc::new(RefCell::new(codes));
 
     let callback_codes = codes_cell.clone();
-    let callback = move |_: &unicorn::Unicorn, address: u64, size: u32| {
+    let callback = move |_: &unicorn::Unicorn<'_>, address: u64, size: u32| {
         let mut codes = callback_codes.borrow_mut();
         codes.push(CodeExpectation(address, size));
     };
@@ -293,7 +293,7 @@ fn x86_intr_callback() {
     let intr_cell = Rc::new(RefCell::new(IntrExpectation(0)));
 
     let callback_intr = intr_cell.clone();
-    let callback = move |_: &unicorn::Unicorn, intno: u32| {
+    let callback = move |_: &unicorn::Unicorn<'_>, intno: u32| {
         *callback_intr.borrow_mut() = IntrExpectation(intno);
     };
 
@@ -335,7 +335,7 @@ fn x86_mem_callback() {
     let mems_cell = Rc::new(RefCell::new(mems));
 
     let callback_mems = mems_cell.clone();
-    let callback = move |_: &unicorn::Unicorn,
+    let callback = move |_: &unicorn::Unicorn<'_>,
                          mem_type: unicorn::MemType,
                          address: u64,
                          size: usize,
@@ -385,7 +385,7 @@ fn x86_insn_in_callback() {
     let insn_cell = Rc::new(RefCell::new(InsnInExpectation(0, 0)));
 
     let callback_insn = insn_cell.clone();
-    let callback = move |_: &unicorn::Unicorn, port: u32, size: usize| {
+    let callback = move |_: &unicorn::Unicorn<'_>, port: u32, size: usize| {
         *callback_insn.borrow_mut() = InsnInExpectation(port, size);
         return 0;
     };
@@ -424,7 +424,7 @@ fn x86_insn_out_callback() {
     let insn_cell = Rc::new(RefCell::new(InsnOutExpectation(0, 0, 0)));
 
     let callback_insn = insn_cell.clone();
-    let callback = move |_: &unicorn::Unicorn, port: u32, size: usize, value: u32| {
+    let callback = move |_: &unicorn::Unicorn<'_>, port: u32, size: usize, value: u32| {
         *callback_insn.borrow_mut() = InsnOutExpectation(port, size, value);
     };
 
@@ -462,7 +462,7 @@ fn x86_insn_sys_callback() {
     let insn_cell = Rc::new(RefCell::new(InsnSysExpectation(0)));
 
     let callback_insn = insn_cell.clone();
-    let callback = move |uc: &unicorn::Unicorn| {
+    let callback = move |uc: &unicorn::Unicorn<'_>| {
         println!("!!!!");
         let rax = uc.reg_read(unicorn::RegisterX86::RAX as i32).unwrap();
         *callback_insn.borrow_mut() = InsnSysExpectation(rax);
