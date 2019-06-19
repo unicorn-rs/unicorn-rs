@@ -80,18 +80,14 @@ extern "C" {
 impl Error {
     pub fn msg(self) -> &'static str {
         unsafe {
-            let s = uc_strerror(self) as *const u8;
-            core::str::from_utf8(slice::from_raw_parts(s, cstr_len(s))).unwrap_or("")
+            let ptr = uc_strerror(self);
+            let len = libc::strlen(ptr);
+            let s = slice::from_raw_parts(ptr as *const u8, len);
+            // We believe that strings returned by `uc_strerror` are always valid ASCII chars.
+            // Hence they also must be a valid Rust str.
+            core::str::from_utf8_unchecked(s)
         }
     }
-}
-
-unsafe fn cstr_len(s: *const u8) -> usize {
-    let mut p = s;
-    while 0 != *p {
-        p = p.add(1);
-    }
-    p as usize - s as usize
 }
 
 impl fmt::Display for Error {
@@ -101,12 +97,4 @@ impl fmt::Display for Error {
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for Error {
-    fn description(&self) -> &str {
-        self.msg().as_bytes()
-    }
-
-    fn cause(&self) -> Option<&std::error::Error> {
-        None
-    }
-}
+impl std::error::Error for Error {}
