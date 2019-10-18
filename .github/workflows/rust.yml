@@ -9,6 +9,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: submodule init
+    - run: git submodule init
+    - name: submodule update
+    - run: git submodule update 
     - name: Build
       run: cargo build --verbose
     - name: Run tests
