@@ -59,7 +59,7 @@ pub enum Error {
     VERSION,         // Unsupported version (bindings)
     READ_UNMAPPED,   // Quit emulation due to READ on unmapped memory: uc_emu_start()
     WRITE_UNMAPPED,  // Quit emulation due to WRITE on unmapped memory: uc_emu_start()
-    ETCH_UNMAPPED,   // Quit emulation due to FETCH on unmapped memory: uc_emu_start()
+    FETCH_UNMAPPED,  // Quit emulation due to FETCH on unmapped memory: uc_emu_start()
     HOOK,            // Invalid hook type: uc_hook_add()
     INSN_INVALID,    // Quit emulation due to invalid instruction: uc_emu_start()
     MAP,             // Invalid memory mapping: uc_mem_map()
