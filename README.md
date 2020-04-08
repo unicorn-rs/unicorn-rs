@@ -4,7 +4,7 @@
 [![Documentation](https://docs.rs/unicorn/badge.svg)](https://docs.rs/unicorn)
 [![Build Status](https://api.travis-ci.org/ekse/unicorn-rs.svg?branch=master)](https://travis-ci.org/ekse/unicorn-rs)
 
-**Looking for maintainers**: This crate is passively maintained. I am looking for new maintainers to take over the project. If you are interested, please open an issue or contact me by email at ekse.0x@gmail.com.
+**THIS PACKAGE IS UNMAINTAINED.**
 
 Rust bindings for the [unicorn](http://www.unicorn-engine.org/) CPU emulator.
 
