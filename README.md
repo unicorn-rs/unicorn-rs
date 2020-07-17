@@ -1,12 +1,21 @@
 # unicorn-rs
 
+**THIS PACKAGE IS DEPRECATED AND NO LONGER MAINTAINED.**
+
+Rust bindings are now included with unicorn and will be maintained there from now on.
+
+https://github.com/unicorn-engine/unicorn/tree/next/bindings/rust
+
+
+## Summary 
+
 [![Cargo](https://img.shields.io/crates/v/unicorn.svg)](https://crates.io/crates/unicorn)
 [![Documentation](https://docs.rs/unicorn/badge.svg)](https://docs.rs/unicorn)
 [![Build Status](https://api.travis-ci.org/ekse/unicorn-rs.svg?branch=master)](https://travis-ci.org/ekse/unicorn-rs)
 
-**THIS PACKAGE IS UNMAINTAINED.**
-
 Rust bindings for the [unicorn](http://www.unicorn-engine.org/) CPU emulator.
+
+
 
 ```rust
 use unicorn::{Cpu, CpuX86};
